@@ -10,7 +10,8 @@
 # 3. This script what will do is take all .dat files of the raw file we'll extract the
 #    wave form perform the fitting that we already know, perform the integral and in the
 #    processed data file we'll only take the A0,A1,A2,...,A6 parameters of each
-#    channel and their respective integral/charge and save them in the form of a csv file.
+#    channel, their respective integral/charge, the time at 10% of the signal and at 90%
+#    and save them in the form of a csv file.
 #    3.1. I'm thinking that that I'll keep the format I've been working on for the end result
 #         of the csv, which is soemthing like
 #     
@@ -25,7 +26,7 @@
 #         last and first value of unix_time column but I don't se how we can do this, so I'll
 #         just keep it.
 
-#  NOTES OF MK1 VERSION: The only difference is that I'll try to implement some parallel processing to try and make this
+#  NOTES OF MK2 VERSION: The only difference is that I'll try to implement some parallel processing to try and make this
 #  faster.
 
 import pandas as pd

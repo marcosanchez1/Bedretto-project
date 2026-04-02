@@ -18,6 +18,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import ast
+import scipy.integrate as integrate
+
 
 def main():
     Voltage = 57
@@ -30,40 +32,37 @@ def main():
 
     RATE = int(round(len(df_fit)/(df_fit['unix_time'].iloc[-1] - df_fit['unix_time'].iloc[0]), 0))
 
-    # We create the dictionary of data
-    channel_number = 1
-    rise_time_key = f'rise_time_ch_{channel_number}'
-    data = {'time_difference':[], rise_time_key:[]}
-
+    # time difference = t0 - t1
+    # charge ratio charge0/charge1
+    data = {'time_difference':[], 'charge_ratio':[]}
     for i in range(len(df_fit['channels'])):
-        time_difference = df_fit['channels'].iloc[i][0]['t_10'] - df_fit['channels'].iloc[i][1]['t_10']
 
-        # We append the values of t
-        data['time_difference'].append(time_difference)
-        
-        if channel_number == 0:
-            RiseTime = df_fit['channels'].iloc[i][0]['t_90'] - df_fit['channels'].iloc[i][0]['t_10']
-        elif channel_number == 1:
-            RiseTime = df_fit['channels'].iloc[i][1]['t_90'] - df_fit['channels'].iloc[i][1]['t_10']
-        
-        # Append rise time
-        data[rise_time_key].append(RiseTime)
+        # Lets get the time at which the signal is at 10% of its
+        # max. value.
+        t0 = df_fit['channels'].iloc[i][0]['t_10']
+        t1 = df_fit['channels'].iloc[i][1]['t_10']
+
+        charge_ch0 = df_fit['channels'].iloc[i][0]['charge']
+        charge_ch1 = df_fit['channels'].iloc[i][1]['charge']
+
+        data['charge_ratio'].append(charge_ch0/charge_ch1)
+        data['time_difference'].append(t0 - t1)
+
 
     # Now let's just plot tL vs tR
     plt.figure(figsize=(8,5))
 
-    N = 2
-    n_bins = int(round(N * np.sqrt(len(data['time_difference'])),0))
+    n_bins = int(round(np.sqrt(len(data['time_difference'])),0))
     h = plt.hist2d(
                    data['time_difference'],
-                   data[rise_time_key],
-                   bins=n_bins, #bins = n_bins x n_bins; since it's a 2D plot
+                   data['charge_ratio'],
+                   bins=n_bins,
                    cmap="turbo"
                    )
-    plt.ylabel(f'Rise Time Ch_{channel_number} (t_90% - t_10%; in ns)')
+    plt.ylabel('Charge Ratio(charge0/charge1)') #I shouldn't call it time of arrival it may generate confusion
     plt.xlabel('Time Difference(t0 - t1; in ns)')
     plt.colorbar(h[3], label="Counts")
-    plt.title(f"Rise Time Ch_{channel_number} vs Time Difference. bins={n_bins};rate={RATE};events={len(data['time_difference'])}")
+    plt.title(f"Charge Ratio vs Time Difference. bins={n_bins};rate={RATE};events={len(data['time_difference'])}")
     plt.grid(True)
     plt.tight_layout()
     #plt.axis('equal')

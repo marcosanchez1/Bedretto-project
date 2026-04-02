@@ -5,7 +5,7 @@ in times at 10% of amplitude but I'll take at the amplitude I think it's easier 
 Also the plot I'm not quite sure but I think I'll do a 2D hi
 
 channel,unix_time
-{0:{fitting_parameters:[A0,A1,...],charge:charge_0,t_10: t_10,t_90:t_90},1:{0:{fitting_parameters:[A0,A1,...],charge:charge_0,t_10: t_10,t_90:t_90}},unix_time_0
+{0:{fit_parameters:[A0,A1,...],charge:charge_0,t_10: t_10,t_90:t_90},1:{0:{fitting_parameters:[A0,A1,...],charge:charge_0,t_10: t_10,t_90:t_90}},unix_time_0
 
 The meaning of the parameters is in the paper but basically the're A0,A1,A2, etc...
 
@@ -17,10 +17,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import ast
-import scipy.integrate as integrate
-
-dt = 0.312 # multiply sample_i by this to get it in ns
-WINDOW = 30*dt # We did the fit until max peak +30
 
 def main():
     Voltage = 57

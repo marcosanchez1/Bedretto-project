@@ -3,7 +3,7 @@ In this script I'll just plot/animate the signals and compare it with the fitted
 The structure of the csv files is like:
 
      channel,unix_time
-     {0:{fitting_parameters:[A0,A1,...],charge:charge_0,t_10: t_10,t_90:t_90},1:{0:{fitting_parameters:[A0,A1,...],charge:charge_0,t_10: t_10,t_90:t_90}},unix_time_0
+     {0:{fit_parameters:[A0,A1,...],charge:charge_0,t_10: t_10,t_90:t_90},1:{0:{fitting_parameters:[A0,A1,...],charge:charge_0,t_10: t_10,t_90:t_90}},unix_time_0
 
 The meaning of the parameters is in the paper but basically the're A0,A1,A2, etc...
 '''

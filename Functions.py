@@ -1,6 +1,5 @@
 import pandas as pd
 import re
-import os
 
 def parse_wavecatcher_file(path):
     events = []
@@ -55,6 +54,7 @@ def parse_wavecatcher_file(path):
 # of a df which will have the structure as:
 #   channels
 #   {0:[samples of channel 0],1:[samples of channel 1]}
-# .
+# this function's purpose is just to be able to read the original raw data and if needed compare it with
+# the fit.
 def get_raw_data(input_path):
     return (parse_wavecatcher_file(input_path))

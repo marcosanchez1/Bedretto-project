@@ -245,7 +245,8 @@ def f(t, A):
 
 def integral(parameters):
 
-    A1 = parameters[1] 
+    A1 = parameters[1]
+    A6 = parameters[6]
     ti = 0
     tf = A1 + WINDOW
     
@@ -254,7 +255,8 @@ def integral(parameters):
     # return a list with one value and we just work with that.
     integral = integrate.quad(lambda t: f(np.array([t]), parameters)[0], ti, tf)
 
-    return integral[0] # integral = (value,error)
+    # Substracting this last term is equivalent to removing the baseline contribution to the integral.
+    return (integral[0] - A6*(tf-ti)) # integral = (value,error)
 
 # We receive the parameters A[i] and fraction is the porcentage of amplitude we wish
 # to find the time of, basically we wish to find t sucha that f(t_i) = Amplitude * fraction.

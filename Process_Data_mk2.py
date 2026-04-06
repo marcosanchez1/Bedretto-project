@@ -48,12 +48,14 @@ WINDOW = 30 * dt
 
 # At least for the first approximation of the baseline we say it's the average of the first
 # 100 samples.
-baseline_window = 100
+baseline_window = 20
 
 # This are the folder routes that we want to process and then store the data.
 # Notice that the route is practically the same except for the second direction
-raw_folder = r".\Data\Raw_data\1Bar_2Chs\57V_varying_gatelength_and_trigger_only"
-processed_folder = r".\Data\Processed_data\1Bar_2Chs\57V_varying_gatelength_and_trigger_only"
+#raw_folder = r".\Data\Raw_data\1Bar_2Chs\57V_varying_gatelength_and_trigger_only"
+#processed_folder = r".\Data\Processed_data\1Bar_2Chs\57V_varying_gatelength_and_trigger_only"
+raw_folder = r".\Data\Raw_data\1Bar_2Chs"
+processed_folder = r".\Data\Processed_data\1Bar_2Chs"
 
 
 
@@ -180,13 +182,7 @@ def process_samples(samples):
 
     t = np.arange(end) * dt # This to convert it to time in ns
 
-    # noise check
-    #if np.max(samples_np) - baseline < 0.02:
-        # If the max amplitude of the sample is less than 0.02 (just as reference the min. unit of trigger we 
-        # can put is 0.001) then just return zero.
-    #    params = np.array([0, 1, 2, 3, 4, 5, baseline], dtype=float)
-    #else:
-        #params = perform_fit(t, samples_np[:end], baseline)
+    # It would be a good ideato check if the fit was performed correctly.
     params = perform_fit(t, samples_np[:end], baseline)
 
     return params

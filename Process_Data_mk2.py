@@ -155,10 +155,19 @@ def parse_wavecatcher_file(path):
     # Assign results back into events
     for ev_index, ch_id, params, charge in results:
         if params is not None:
-            events[ev_index]["channels"][ch_id]["fit_parameters"] = params.tolist()
-            events[ev_index]["channels"][ch_id]["charge"] = float(charge) # units of V*ns
-            events[ev_index]["channels"][ch_id]['t_10'] = get_t(params,0.1) # units of ns
-            events[ev_index]["channels"][ch_id]['t_90'] = get_t(params,0.9) # units of ns
+            A = params.tolist()
+            charge = float(charge)
+            t_10 = get_t(params, 0.1)
+            t_90 = get_t(params, 0.9)
+
+            events[ev_index]["channels"][ch_id]["fit_parameters"] = A
+            events[ev_index]["channels"][ch_id]["charge"] = charge
+            events[ev_index]["channels"][ch_id]['t_10'] = t_10
+            if t_90 is not None and not np.isnan(t_90):
+                events[ev_index]["channels"][ch_id]['t_90'] = t_90
+            else:
+                events[ev_index]["channels"][ch_id]['t_90'] = A[1] # kind of a fix, lets see
+
         else:
             events[ev_index]["channels"][ch_id]["fit_parameters"] = None
             events[ev_index]["channels"][ch_id]["charge"] = None
@@ -184,6 +193,7 @@ def process_samples(samples):
 
     # It would be a good ideato check if the fit was performed correctly.
     params = perform_fit(t, samples_np[:end], baseline)
+    
 
     return params
 
@@ -262,7 +272,7 @@ def get_t(A, fraction):
     A0, A1, A2, A3, A4, A5, A6 = A
 
     # Build a time axis from 0 to peak+WINDOW
-    t = np.linspace(0, A1 + WINDOW, 2000)
+    t = np.linspace(0, A1 + WINDOW, 3000)
 
     # Evaluate waveform
     y = f(t,A)

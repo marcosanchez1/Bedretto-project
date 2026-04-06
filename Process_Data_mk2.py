@@ -28,6 +28,10 @@
 
 #  NOTES OF MK2 VERSION: The only difference is that I'll try to implement some parallel processing to try and make this
 #  faster.
+#  Also, I noticed that for low signals we were having some issues: 1) t_90 was giving nan values but t_10 was always good
+#  so I put a condition that if it's nan then just take t_90=A1 which is not correct but at least for now I think will do
+#  2) when low signals happened, to be precise max < 0.02 before I was taking these signals as just zero, but it's not okay
+#  there were some relevant events that I was taking incorrectly so now I'm always performing the fit no matter what.
 
 import pandas as pd
 import re

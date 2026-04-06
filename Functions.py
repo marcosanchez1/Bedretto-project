@@ -9,6 +9,7 @@ def parse_wavecatcher_file(path):
     # Regex patterns
     event_header_re = re.compile(r"=== EVENT (\d+) ===")
     ch_re = re.compile(r"CH:\s*(\d+)\s*EVENTID:\s*(\d+)")
+    unix_re = re.compile(r"UnixTime = ([0-9.]+)")
 
     with open(path, "r") as f:
         for line in f:
@@ -21,8 +22,14 @@ def parse_wavecatcher_file(path):
                     events.append(current_event)
 
                 # Only keep channels → samples
-                current_event = {"channels": {}}
+                current_event = {"channels": {}, 'unix_time': None}
                 current_channel = None
+                continue
+            
+            # Extract Unix time
+            m_unix = unix_re.search(line)
+            if m_unix and current_event is not None:
+                current_event["unix_time"] = float(m_unix.group(1))
                 continue
 
             # Detect new channel

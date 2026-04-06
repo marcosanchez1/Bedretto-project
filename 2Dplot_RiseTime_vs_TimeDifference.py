@@ -20,12 +20,13 @@ import pandas as pd
 import ast
 
 def main():
-    Voltage = 57
-    run = 0
-    day = 16
+    Voltage = '-0.920'
+    run = 2
+    day = 31
+    month = 3
 
     # Load fitted data
-    df_fit = pd.read_csv(f".\\Data\\Processed_data\\1Bar_2Chs\\Run_{Voltage}V_Run{run}_Data_3_{day}_2026_Ascii.csv")
+    df_fit = pd.read_csv(f".\\Data\\Processed_data\\1Bar_2Chs\\57V_varying_gatelength_and_trigger_only\\Run_{Voltage}V_Run{run}_Data_{month}_{day}_2026_Ascii.csv")
     df_fit["channels"] = df_fit["channels"].apply(ast.literal_eval)
 
     RATE = int(round(len(df_fit)/(df_fit['unix_time'].iloc[-1] - df_fit['unix_time'].iloc[0]), 0))
@@ -54,11 +55,14 @@ def main():
 
     N = 2
     n_bins = int(round(N * np.sqrt(len(data['time_difference'])),0))
+    time_limits = [min(data['time_difference']), max(data['time_difference'])-30]
+    RiseTime_limits = [min(data[rise_time_key]), max(data[rise_time_key])]
     h = plt.hist2d(
                    data['time_difference'],
                    data[rise_time_key],
                    bins=n_bins, #bins = n_bins x n_bins; since it's a 2D plot
-                   cmap="turbo"
+                   cmap="turbo",
+                   range=[time_limits, RiseTime_limits]
                    )
     plt.ylabel(f'Rise Time Ch_{channel_number} (t_90% - t_10%; in ns)')
     plt.xlabel('Time Difference(t0 - t1; in ns)')

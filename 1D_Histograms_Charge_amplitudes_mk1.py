@@ -1,39 +1,36 @@
 '''
-In this script I'll just compute the histograms of the charge distributions using the raw values
+In this script I'll just compute the histograms of the charge distributions using the fitted values
 for both channels so far I've been just working with channel 0 and 1 so I'll just stick to that.
+The structure of the data is as follows:
+channel,unix_time
+{0:{fit_parameters:[A0,A1,...],charge:charge_0,t_10: t_10,t_90:t_90},1:{0:{fitting_parameters:[A0,A1,...],charge:charge_0,t_10: t_10,t_90:t_90}},unix_time_0
+
 '''
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import ast
-from Functions import get_raw_data
 
 def main():
-    voltage = '-0.980' # In 58 we just begin to distinguish the muon mountain
+    voltage = '-0.995' # In 58 we just begin to distinguish the muon mountain
     #trigger_oscilloscope = -0.95
     run = 1
     day = 31
     month = 3
-    dt = 0.312 # multiply sample_i by this to get it in ns
 
-    df = get_raw_data(f".\\Data\\Raw_data\\1Bar_2Chs\\57V_varying_gatelength_and_trigger_only\\Run_{voltage}V_Run{run}_Data_{month}_{day}_2026_Ascii.dat") 
-    
+    df = pd.read_csv(f".\\Data\\Processed_data\\1Bar_2Chs\\57V_varying_gatelength_and_trigger_only\\Run_{voltage}V_Run{run}_Data_{month}_{day}_2026_Ascii.csv")
+    df["channels"] = df["channels"].apply(ast.literal_eval)
+
     # compute rate
     RATE = len(df['unix_time'])/(df['unix_time'].iloc[-1] - df['unix_time'].iloc[0])
-    
-    charge_ch0 = []
-    charge_ch1 = []
-    max_V0 = []
-    max_V1 = []
-    for row in df['channels']:
-        baseline_ch0 = np.mean(row[0][:20]) # Assuming the first 10 samples are baseline
-        charge_ch0.append(np.sum(row[0] - baseline_ch0)*dt) # Subtract baseline and multiply by dt to get charge in V*ns
         
-        baseline_ch1 = np.mean(row[1][:20]) # Assuming the first 10
-        charge_ch1.append(np.sum(row[1] - baseline_ch1)*dt) # Subtract baseline and multiply by dt to get charge in V*ns
+    #I may get negative values if we put an offset that moves the signal below the x-axis and I guess it makes sens
+    # we get a "negative area" since we're computing it in the negative y-axis.
+    charge_ch0 = [row[0]['charge'] for row in df["channels"]]
+    charge_ch1 = [row[1]['charge'] for row in df["channels"]]
 
-        max_V0.append(np.max(row[0] - baseline_ch0)) # Subtract baseline to get the actual amplitude of the signal
-        max_V1.append(np.max(row[1] - baseline_ch1)) # Subtract baseline to get the actual amplitude of the signal
+    max_V0 = [row[0]['fit_parameters'][0] for row in df['channels']] #parameters[0]=A0 which is the amplitude not considering baseline.
+    max_V1 = [row[1]['fit_parameters'][0] for row in df['channels']]
 
     # ____________________________________________Plotting: For some reason it's taking too long to make the plots
     fig, axs = plt.subplots(2, 2, figsize=(10, 8))

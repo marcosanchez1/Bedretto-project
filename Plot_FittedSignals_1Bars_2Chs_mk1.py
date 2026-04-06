@@ -39,16 +39,17 @@ def f(t, A):
 
 
 def main():
-    Voltage = 57
-    trigger_oscilloscope = -0.950
-    run = 0
-    day = 16
+    Voltage = '-0.980'
+    trigger_oscilloscope = -0.980
+    run = 1
+    day = 31
+    month = 3
 
     # Load raw data
-    df_raw = get_raw_data(f".\\Data\\Raw_data\\1Bar_2Chs\\Run_{Voltage}V_Run{run}_Data_3_{day}_2026_Ascii.dat")
+    df_raw = get_raw_data(f".\\Data\\Raw_data\\1Bar_2Chs\\57V_varying_gatelength_and_trigger_only\\Run_{Voltage}V_Run{run}_Data_{month}_{day}_2026_Ascii.dat")
 
     # Load fitted data
-    df_fit = pd.read_csv(f".\\Data\\Processed_data\\1Bar_2Chs\\Run_{Voltage}V_Run{run}_Data_3_{day}_2026_Ascii.csv")
+    df_fit = pd.read_csv(f".\\Data\\Processed_data\\1Bar_2Chs\\57V_varying_gatelength_and_trigger_only\\Run_{Voltage}V_Run{run}_Data_{month}_{day}_2026_Ascii.csv")
     df_fit["channels"] = df_fit["channels"].apply(ast.literal_eval)
 
     # Extract raw samples

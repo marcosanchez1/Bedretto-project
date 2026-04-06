@@ -19,18 +19,19 @@ import pandas as pd
 import ast
 
 def main():
-    Voltage = 57
-    run = 0
-    day = 16
+    Voltage = '-0.920'
+    run = 2
+    day = 31
+    month = 3
 
     # Load fitted data
-    df_fit = pd.read_csv(f".\\Data\\Processed_data\\1Bar_2Chs\\Run_{Voltage}V_Run{run}_Data_3_{day}_2026_Ascii.csv")
+    df_fit = pd.read_csv(f".\\Data\\Processed_data\\1Bar_2Chs\\57V_varying_gatelength_and_trigger_only\\Run_{Voltage}V_Run{run}_Data_{month}_{day}_2026_Ascii.csv")
     df_fit["channels"] = df_fit["channels"].apply(ast.literal_eval)
 
     RATE = int(round(len(df_fit)/(df_fit['unix_time'].iloc[-1] - df_fit['unix_time'].iloc[0]), 0))
     
     # time difference = t0 - t1
-    channel_number = 1
+    channel_number = 0
     charge_key = f'charge_ch{channel_number}'
     data = {'time_difference':[], charge_key:[]}
 

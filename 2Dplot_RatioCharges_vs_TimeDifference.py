@@ -22,12 +22,13 @@ import scipy.integrate as integrate
 
 
 def main():
-    Voltage = 57
-    run = 0
-    day = 16
+    Voltage = '-0.920'
+    run = 2
+    day = 31
+    month = 3
 
     # Load fitted data
-    df_fit = pd.read_csv(f".\\Data\\Processed_data\\1Bar_2Chs\\Run_{Voltage}V_Run{run}_Data_3_{day}_2026_Ascii.csv")
+    df_fit = pd.read_csv(f".\\Data\\Processed_data\\1Bar_2Chs\\57V_varying_gatelength_and_trigger_only\\Run_{Voltage}V_Run{run}_Data_{month}_{day}_2026_Ascii.csv")
     df_fit["channels"] = df_fit["channels"].apply(ast.literal_eval)
 
     RATE = int(round(len(df_fit)/(df_fit['unix_time'].iloc[-1] - df_fit['unix_time'].iloc[0]), 0))
@@ -57,7 +58,8 @@ def main():
                    data['time_difference'],
                    data['charge_ratio'],
                    bins=n_bins,
-                   cmap="turbo"
+                   cmap="turbo",
+                   range = [[min(data['time_difference']), max(data['time_difference'])-30], [min(data['charge_ratio']), max(data['charge_ratio'])]]
                    )
     plt.ylabel('Charge Ratio(charge0/charge1)') #I shouldn't call it time of arrival it may generate confusion
     plt.xlabel('Time Difference(t0 - t1; in ns)')

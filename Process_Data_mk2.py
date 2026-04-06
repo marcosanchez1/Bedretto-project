@@ -181,12 +181,13 @@ def process_samples(samples):
     t = np.arange(end) * dt # This to convert it to time in ns
 
     # noise check
-    if np.max(samples_np) - baseline < 0.02:
+    #if np.max(samples_np) - baseline < 0.02:
         # If the max amplitude of the sample is less than 0.02 (just as reference the min. unit of trigger we 
         # can put is 0.001) then just return zero.
-        params = np.array([0, 1, 2, 3, 4, 5, baseline], dtype=float)
-    else:
-        params = perform_fit(t, samples_np[:end], baseline)
+    #    params = np.array([0, 1, 2, 3, 4, 5, baseline], dtype=float)
+    #else:
+        #params = perform_fit(t, samples_np[:end], baseline)
+    params = perform_fit(t, samples_np[:end], baseline)
 
     return params
 

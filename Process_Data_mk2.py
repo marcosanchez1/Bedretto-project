@@ -46,7 +46,7 @@ from multiprocessing import Pool, cpu_count
 
 # This dt is the time spacing between samples, we multiply the sample number by this
 # to know the position in time of the sample.
-dt = 0.312 # multiply by this to get it in ns
+dt = 0.3125 # multiply by this to get it in ns
 
 # We will perform the fit until peak + 30 samples more,
 WINDOW = 30 * dt
@@ -57,10 +57,10 @@ baseline_window = 20
 
 # This are the folder routes that we want to process and then store the data.
 # Notice that the route is practically the same except for the second direction
-#raw_folder = r".\Data\Raw_data\1Bar_2Chs\57V_varying_gatelength_and_trigger_only"
-#processed_folder = r".\Data\Processed_data\1Bar_2Chs\57V_varying_gatelength_and_trigger_only"
-raw_folder = r".\Data\Raw_data\1Bar_2Chs"
-processed_folder = r".\Data\Processed_data\1Bar_2Chs"
+raw_folder = r".\Data\Raw_data\1Bar_2Chs\57V_varying_gatelength_and_trigger_only"
+processed_folder = r".\Data\Processed_data\1Bar_2Chs\57V_varying_gatelength_and_trigger_only"
+#raw_folder = r".\Data\Raw_data\1Bar_2Chs"
+#processed_folder = r".\Data\Processed_data\1Bar_2Chs"
 
 
 

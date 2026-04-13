@@ -41,6 +41,7 @@ def main(route_data, route_figure):
         charge_ch0 = df_fit['channels'].iloc[i][0]['charge']
         charge_ch1 = df_fit['channels'].iloc[i][1]['charge']
 
+        # What else could we do if we have a division by zero???
         if charge_ch1 == 0:
             continue
         else:

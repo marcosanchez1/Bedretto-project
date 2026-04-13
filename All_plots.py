@@ -11,6 +11,7 @@ from Histograms1D_Charge_amplitudes_mk1 import main as main_histograms
 from Plot2D_Charge_vs_TimeDifference import main as main_charge_vs_time
 from Plot2D_RatioCharges_vs_TimeDifference import main as main_ratio_charge_vs_time
 from Plot2D_RiseTime_vs_TimeDifference import main as main_rise_time_vs_time_difference
+from Plot2D_charge_vs_charge import main as main_charge_vs_charge
 
 def main():
     voltage = '57' # In 58 we just begin to distinguish the muon mountain
@@ -31,6 +32,7 @@ def main():
     # Make all the plots
     main_histograms(route_data, route_figure)
     main_ratio_charge_vs_time(route_data, route_figure)
+    main_charge_vs_charge(route_data, route_figure)
     for i in [0,1]:
         main_charge_vs_time(route_data, route_figure, i)
         main_rise_time_vs_time_difference(route_data, route_figure, i)

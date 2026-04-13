@@ -57,10 +57,10 @@ baseline_window = 20
 
 # This are the folder routes that we want to process and then store the data.
 # Notice that the route is practically the same except for the second direction
-raw_folder = r".\Data\Raw_data\1Bar_2Chs\57V_varying_gatelength_and_trigger_only"
-processed_folder = r".\Data\Processed_data\1Bar_2Chs\57V_varying_gatelength_and_trigger_only"
-#raw_folder = r".\Data\Raw_data\1Bar_2Chs"
-#processed_folder = r".\Data\Processed_data\1Bar_2Chs"
+#raw_folder = r".\Data\Raw_data\1Bar_2Chs\57V_varying_gatelength_and_trigger_only"
+#processed_folder = r".\Data\Processed_data\1Bar_2Chs\57V_varying_gatelength_and_trigger_only"
+raw_folder = r".\Data\Raw_data\1Bar_2Chs"
+processed_folder = r".\Data\Processed_data\1Bar_2Chs"
 
 
 
@@ -271,7 +271,7 @@ def integral(parameters):
     # Due to the fact that f takes a numpy list of t and returns a list of f, since
     # in this case we needed a 1:1 function. We just give a list with 1 value and will
     # return a list with one value and we just work with that.
-    integral = integrate.quad(lambda t: f(np.array([t]) - A6, parameters)[0], ti, tf)
+    integral = integrate.quad(lambda t: f(np.array([t]), parameters)[0] - A6, ti, tf)
     # Notice that we substract A6 from the function and not after integration, should be
     # the same, but I'll do it this way.
 

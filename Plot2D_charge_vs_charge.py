@@ -29,8 +29,8 @@ def main(route_data, route_figure):
                    cmap="turbo",
                    range = [[min(data['charge_0']), max(data['charge_0'])], [min(data['charge_1']), max(data['charge_1'])]]
                    )
-    plt.ylabel('Charge channel-1') #I shouldn't call it time of arrival it may generate confusion
-    plt.xlabel('Charge channel-0')
+    plt.ylabel('Charge channel-1 (V*ns)') #I shouldn't call it time of arrival it may generate confusion
+    plt.xlabel('Charge channel-0 (V*ns)')
     plt.colorbar(h[3], label="Counts")
     plt.title(f"Charge-1 vs Charge-0. bins={n_bins};rate={RATE};events={len(data['charge_0'])}")
     plt.grid(True)

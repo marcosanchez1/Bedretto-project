@@ -18,30 +18,36 @@ import numpy as np
 import pandas as pd
 import ast
 
-def main(route_data, route_figure, channel_number):
+from Condition_to_take_event import discriminated_df
+
+def main(route_data, route_figure, channel_number, trigger):
 
     # Load fitted data
-    df_fit = pd.read_csv(route_data)
-    df_fit["channels"] = df_fit["channels"].apply(ast.literal_eval)
+    df = pd.read_csv(route_data)
+    df["channels"] = df["channels"].apply(ast.literal_eval)
 
-    RATE = int(round(len(df_fit)/(df_fit['unix_time'].iloc[-1] - df_fit['unix_time'].iloc[0]), 0))
+    RATE = int(round(len(df)/(df['unix_time'].iloc[-1] - df['unix_time'].iloc[0]), 0))
+
+    # ____________________________________________Conditions____________________________________________________
+    # I'll add some conditions to select or discriminate events, it can be based, on raise time or charge or whatever.
+    df = discriminated_df(df, trigger)
     
     # time difference = t0 - t1
     charge_key = f'charge_ch{channel_number}'
     data = {'time_difference':[], charge_key:[]}
 
-    for i in range(len(df_fit['channels'])):
+    for i in range(len(df['channels'])):
 
         # Lets get the time at which the signal is at 10% of its
         # max. value.
-        t0 = df_fit["channels"].iloc[i][0]['t_10'] # We take the t_10 of the first channel as reference time for the event.
-        t1 = df_fit["channels"].iloc[i][1]['t_10'] # We take the t_10 of the second channel as reference time for the event.
+        t0 = df["channels"].iloc[i][0]['t_10'] # We take the t_10 of the first channel as reference time for the event.
+        t1 = df["channels"].iloc[i][1]['t_10'] # We take the t_10 of the second channel as reference time for the event.
         time_difference = t0 - t1
 
         if charge_key == 'charge_ch0':
-            charge_chN = df_fit["channels"].iloc[i][0]['charge'] # We take the charge of the first channel as reference charge for the event.
+            charge_chN = df["channels"].iloc[i][0]['charge'] # We take the charge of the first channel as reference charge for the event.
         elif charge_key =='charge_ch1':
-            charge_chN = df_fit["channels"].iloc[i][1]['charge'] # We take the charge of the second channel as reference charge for the event.
+            charge_chN = df["channels"].iloc[i][1]['charge'] # We take the charge of the second channel as reference charge for the event.
 
         if True:#time_difference >= -1 and time_difference <= 1:     
             # We append the values of t

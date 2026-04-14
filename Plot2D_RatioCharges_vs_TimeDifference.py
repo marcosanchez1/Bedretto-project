@@ -19,29 +19,34 @@ import numpy as np
 import pandas as pd
 import ast
 
+from Condition_to_take_event import discriminated_df
 
-def main(route_data, route_figure):
+def main(route_data, route_figure, trigger):
 
     # Load fitted data
-    df_fit = pd.read_csv(route_data)
-    df_fit["channels"] = df_fit["channels"].apply(ast.literal_eval)
-
-    RATE = int(round(len(df_fit)/(df_fit['unix_time'].iloc[-1] - df_fit['unix_time'].iloc[0]), 0))
+    df = pd.read_csv(route_data)
+    df["channels"] = df["channels"].apply(ast.literal_eval)
+    
+    RATE = int(round(len(df)/(df['unix_time'].iloc[-1] - df['unix_time'].iloc[0]), 0))
+    
+    # ____________________________________________Conditions____________________________________________________
+    # I'll add some conditions to select or discriminate events, it can be based, on raise time or charge or whatever.
+    df = discriminated_df(df, trigger)
 
     # time difference = t0 - t1
     # charge ratio charge0/charge1
     data = {'time_difference':[], 'charge_ratio':[]}
-    for i in range(len(df_fit['channels'])):
+    for i in range(len(df['channels'])):
 
         # Lets get the time at which the signal is at 10% of its
         # max. value.
-        t0 = df_fit['channels'].iloc[i][0]['t_10']
-        t1 = df_fit['channels'].iloc[i][1]['t_10']
+        t0 = df['channels'].iloc[i][0]['t_10']
+        t1 = df['channels'].iloc[i][1]['t_10']
 
-        charge_ch0 = df_fit['channels'].iloc[i][0]['charge']
-        charge_ch1 = df_fit['channels'].iloc[i][1]['charge']
+        charge_ch0 = df['channels'].iloc[i][0]['charge']
+        charge_ch1 = df['channels'].iloc[i][1]['charge']
 
-        # What else could we do if we have a division by zero???
+        # What else could we have done?
         if charge_ch1 == 0:
             continue
         else:

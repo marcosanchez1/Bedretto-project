@@ -19,28 +19,34 @@ import numpy as np
 import pandas as pd
 import ast
 
-def main(route_data, route_figure, channel_number):
+from Condition_to_take_event import discriminated_df
+
+def main(route_data, route_figure, channel_number, trigger):
 
     # Load fitted data
-    df_fit = pd.read_csv(route_data)
-    df_fit["channels"] = df_fit["channels"].apply(ast.literal_eval)
+    df = pd.read_csv(route_data)
+    df["channels"] = df["channels"].apply(ast.literal_eval)
 
-    RATE = int(round(len(df_fit)/(df_fit['unix_time'].iloc[-1] - df_fit['unix_time'].iloc[0]), 0))
+    RATE = int(round(len(df)/(df['unix_time'].iloc[-1] - df['unix_time'].iloc[0]), 0))
 
+    # ____________________________________________Conditions____________________________________________________
+    # I'll add some conditions to select or discriminate events, it can be based, on raise time or charge or whatever.
+    df = discriminated_df(df, trigger)
+    
     # We create the dictionary of data
     rise_time_key = f'rise_time_ch_{channel_number}'
     data = {'time_difference':[], rise_time_key:[]}
 
-    for i in range(len(df_fit['channels'])):
-        time_difference = df_fit['channels'].iloc[i][0]['t_10'] - df_fit['channels'].iloc[i][1]['t_10']
+    for i in range(len(df['channels'])):
+        time_difference = df['channels'].iloc[i][0]['t_10'] - df['channels'].iloc[i][1]['t_10']
 
         # We append the values of t
         data['time_difference'].append(time_difference)
         
         if channel_number == 0:
-            RiseTime = df_fit['channels'].iloc[i][0]['t_90'] - df_fit['channels'].iloc[i][0]['t_10']
+            RiseTime = df['channels'].iloc[i][0]['t_90'] - df['channels'].iloc[i][0]['t_10']
         elif channel_number == 1:
-            RiseTime = df_fit['channels'].iloc[i][1]['t_90'] - df_fit['channels'].iloc[i][1]['t_10']
+            RiseTime = df['channels'].iloc[i][1]['t_90'] - df['channels'].iloc[i][1]['t_10']
         
         # Append rise time
         data[rise_time_key].append(RiseTime)

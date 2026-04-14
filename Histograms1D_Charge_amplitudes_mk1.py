@@ -11,12 +11,19 @@ import numpy as np
 import pandas as pd
 import ast
 
-def main(route_data, route_figure): 
+from Condition_to_take_event import discriminated_df
+
+def main(route_data, route_figure, trigger): 
     df = pd.read_csv(route_data)
     df["channels"] = df["channels"].apply(ast.literal_eval)
 
     # compute rate
     RATE = len(df['unix_time'])/(df['unix_time'].iloc[-1] - df['unix_time'].iloc[0])
+
+    # ____________________________________________Conditions____________________________________________________
+    # I'll add some conditions to select or discriminate events, it can be based, on raise time or charge or whatever.
+    df = discriminated_df(df, trigger)
+
         
     #I may get negative values if we put an offset that moves the signal below the x-axis and I guess it makes sens
     # we get a "negative area" since we're computing it in the negative y-axis.
@@ -26,7 +33,7 @@ def main(route_data, route_figure):
     max_V0 = [row[0]['fit_parameters'][0] for row in df['channels']] #parameters[0]=A0 which is the amplitude not considering baseline.
     max_V1 = [row[1]['fit_parameters'][0] for row in df['channels']]
 
-    # ____________________________________________Plotting: For some reason it's taking too long to make the plots
+    # ____________________________________________Plotting____________________________________________________
     fig, axs = plt.subplots(2, 2, figsize=(10, 8))
     ax1, ax2, ax3, ax4 = axs.flatten()
 
@@ -40,8 +47,8 @@ def main(route_data, route_figure):
     bins4 = int(N * np.sqrt(len(max_V1)))
 
     #Plot histograms for charge distributions
-    sup_lim = max(charge_ch0)
     bot_lim = min(charge_ch0)
+    sup_lim = 1.5#max(charge_ch0)
     ax1.hist(
             charge_ch0,
             bins=bins1,
@@ -55,8 +62,8 @@ def main(route_data, route_figure):
     ax1.legend()
     ax1.grid(True)
 
-    sup_lim = max(charge_ch1)
     bot_lim = min(charge_ch1)
+    sup_lim = 1.5#max(charge_ch1)
     ax2.hist(
             charge_ch1, 
             bins=bins2,
@@ -109,10 +116,13 @@ def main(route_data, route_figure):
 
 if __name__ == "__main__":
     voltage = '57' # In 58 we just begin to distinguish the muon mountain
-    run = 1
-    day = 9
+    run = 0
+    day = 16
     month = 3
+    
     route_data = f".\\Data\\Processed_data\\1Bar_2Chs\\Run_{voltage}V_Run{run}_Data_{month}_{day}_2026_Ascii.csv"
+    #route_data = f".\\Data\\Processed_data\\1Bar_2Chs\\57V_varying_gatelength_and_trigger_only\\Run_{voltage}V_Run{run}_Data_{month}_{day}_2026_Ascii.csv"
+
     route_figure = f".\\Data\\Figures\\1Bar_2Chs"
     
     main(route_data, route_figure)

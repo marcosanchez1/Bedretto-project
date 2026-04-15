@@ -21,17 +21,7 @@ import ast
 
 from Condition_to_take_event import discriminated_df
 
-def main(route_data, route_figure, trigger):
-
-    # Load fitted data
-    df = pd.read_csv(route_data)
-    df["channels"] = df["channels"].apply(ast.literal_eval)
-    
-    RATE = int(round(len(df)/(df['unix_time'].iloc[-1] - df['unix_time'].iloc[0]), 0))
-    
-    # ____________________________________________Conditions____________________________________________________
-    # I'll add some conditions to select or discriminate events, it can be based, on raise time or charge or whatever.
-    df = discriminated_df(df, trigger)
+def main(df, RATE, route_figure):
 
     # time difference = t0 - t1
     # charge ratio charge0/charge1
@@ -77,6 +67,7 @@ def main(route_data, route_figure, trigger):
 
 if __name__ == "__main__":
     Voltage = '57'
+    trigger = '0.05' # in volts.
     run = 1
     day = 9
     month = 3
@@ -84,6 +75,16 @@ if __name__ == "__main__":
     route_data = f".\\Data\\Processed_data\\1Bar_2Chs\\Run_{Voltage}V_Run{run}_Data_{month}_{day}_2026_Ascii.csv"
     route_figure = f".\\Data\\Figures\\1Bar_2Chs"
 
-    main(route_data, route_figure)
+    # Load fitted data
+    df = pd.read_csv(route_data)
+    df["channels"] = df["channels"].apply(ast.literal_eval)
+    
+    RATE = int(round(len(df)/(df['unix_time'].iloc[-1] - df['unix_time'].iloc[0]), 0))
+    
+    # ____________________________________________Conditions____________________________________________________
+    # I'll add some conditions to select or discriminate events, it can be based, on raise time or charge or whatever.
+    df = discriminated_df(df, float(trigger))
+
+    main(df, RATE, route_figure)
 
     print("\nEnd of execution.\n")

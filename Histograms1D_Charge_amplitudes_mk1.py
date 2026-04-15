@@ -13,18 +13,7 @@ import ast
 
 from Condition_to_take_event import discriminated_df
 
-def main(route_data, route_figure, trigger): 
-    df = pd.read_csv(route_data)
-    df["channels"] = df["channels"].apply(ast.literal_eval)
-
-    # compute rate
-    RATE = len(df['unix_time'])/(df['unix_time'].iloc[-1] - df['unix_time'].iloc[0])
-
-    # ____________________________________________Conditions____________________________________________________
-    # I'll add some conditions to select or discriminate events, it can be based, on raise time or charge or whatever.
-    df = discriminated_df(df, trigger)
-
-        
+def main(df, RATE, route_figure): 
     #I may get negative values if we put an offset that moves the signal below the x-axis and I guess it makes sens
     # we get a "negative area" since we're computing it in the negative y-axis.
     charge_ch0 = [row[0]['charge'] for row in df["channels"]]
@@ -114,8 +103,10 @@ def main(route_data, route_figure, trigger):
     
     return 0
 
+# this is in case we want to run this script separately
 if __name__ == "__main__":
     voltage = '57' # In 58 we just begin to distinguish the muon mountain
+    trigger = '0.05' # in volts.
     run = 0
     day = 16
     month = 3
@@ -124,7 +115,17 @@ if __name__ == "__main__":
     #route_data = f".\\Data\\Processed_data\\1Bar_2Chs\\57V_varying_gatelength_and_trigger_only\\Run_{voltage}V_Run{run}_Data_{month}_{day}_2026_Ascii.csv"
 
     route_figure = f".\\Data\\Figures\\1Bar_2Chs"
+
+    df = pd.read_csv(route_data)
+    df["channels"] = df["channels"].apply(ast.literal_eval)
+
+    # compute rate
+    RATE = len(df['unix_time'])/(df['unix_time'].iloc[-1] - df['unix_time'].iloc[0])
+
+   # ____________________________________________Conditions____________________________________________________
+    # I'll add some conditions to select or discriminate events, it can be based, on raise time or charge or whatever.
+    df = discriminated_df(df, float(trigger))
     
-    main(route_data, route_figure)
+    main(df, RATE, route_figure)
 
     print("\nEnd of execution.\n")

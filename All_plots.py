@@ -6,13 +6,20 @@ The struture of the processed data is as follows:
 
 '''
 
-# Scripts I did before to plot
-from Histograms1D_Charge_amplitudes_mk1 import main as main_histograms
+# Standard python libraries
+import ast
+import pandas as pd
+
+# Scripts I did
+from Condition_to_take_event import discriminated_df # discriminated events
+
+# Scripts I did for plotting and saving plots
+from Histograms1D_Charge_amplitudes_mk1 import main as charge_histogram
 from Plot2D_Charge_vs_TimeDifference import main as main_charge_vs_time
-from Plot2D_RatioCharges_vs_TimeDifference import main as main_ratio_charge_vs_time
-from Plot2D_RiseTime_vs_TimeDifference import main as main_rise_time_vs_time_difference
-from Plot2D_charge_vs_charge import main as main_charge_vs_charge
-from Histogram_TimeDifference import main as main_histogram_time_difference
+from Plot2D_RatioCharges_vs_TimeDifference import main as ratio_charge_vs_time
+from Plot2D_RiseTime_vs_TimeDifference import main as rise_time_vs_time_difference
+from Plot2D_charge_vs_charge import main as charge_vs_charge
+from Histogram_TimeDifference import main as histogram_time_difference
 
 def main():
     voltage = '57' # In 58 we just begin to distinguish the muon mountain
@@ -29,16 +36,24 @@ def main():
     #route of folder where to save the figures
     #route_figure = fr".\Plots\1Bar_2Chs\57V_Run1_triggerNormal_0.05_gate_15ns_tr"
     #route_figure = fr".\Plots\1Bar_2Chs\VaryingTriggerGate\{trigger} with {gate_length}ns"
-    route_figure = fr".\Plots\1Bar_2Chs\57V_Run1_triggerNormal_0.05_gate_15ns_tr\Scan_RefCh0_Ch1Above10mV"
+    route_figure = fr".\Plots\1Bar_2Chs\57V_Run1_triggerNormal_0.05_gate_15ns_tr\Scan_RefCh0_Ch1Above30mV"
+
+    df = pd.read_csv(route_data)
+    df["channels"] = df["channels"].apply(ast.literal_eval)
+
+    # compute rate
+    RATE = len(df['unix_time'])/(df['unix_time'].iloc[-1] - df['unix_time'].iloc[0])
+
+    df = discriminated_df(df, float(trigger))
 
     # Make all the plots
-    main_histograms(route_data, route_figure, float(trigger))
-    main_ratio_charge_vs_time(route_data, route_figure, float(trigger))
-    main_charge_vs_charge(route_data, route_figure, float(trigger))
-    main_histogram_time_difference(route_data, route_figure, float(trigger))
+    charge_histogram(df, RATE, route_figure)
+    ratio_charge_vs_time(df, RATE, route_figure)
+    charge_vs_charge(df, RATE, route_figure)
+    histogram_time_difference(df, RATE, route_figure)
     for i in [0,1]:
-        main_charge_vs_time(route_data, route_figure, i, float(trigger))
-        main_rise_time_vs_time_difference(route_data, route_figure, i, float(trigger))
+        main_charge_vs_time(df, RATE, route_figure, i)
+        rise_time_vs_time_difference(df, RATE, route_figure, i)
 
     return 0
 

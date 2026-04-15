@@ -20,17 +20,7 @@ import ast
 
 from Condition_to_take_event import discriminated_df
 
-def main(route_data, route_figure, channel_number, trigger):
-
-    # Load fitted data
-    df = pd.read_csv(route_data)
-    df["channels"] = df["channels"].apply(ast.literal_eval)
-
-    RATE = int(round(len(df)/(df['unix_time'].iloc[-1] - df['unix_time'].iloc[0]), 0))
-
-    # ____________________________________________Conditions____________________________________________________
-    # I'll add some conditions to select or discriminate events, it can be based, on raise time or charge or whatever.
-    df = discriminated_df(df, trigger)
+def main(df, RATE, route_figure, channel_number):
     
     # time difference = t0 - t1
     charge_key = f'charge_ch{channel_number}'
@@ -84,6 +74,7 @@ def main(route_data, route_figure, channel_number, trigger):
 
 if __name__ == "__main__":
     voltage = '57' # In 58 we just begin to distinguish the muon mountain
+    trigger = '0.05' # in volts.
     run = 1
     day = 9
     month = 3
@@ -91,7 +82,17 @@ if __name__ == "__main__":
 
     route_data = f".\\Data\\Processed_data\\1Bar_2Chs\\Run_{voltage}V_Run{run}_Data_{month}_{day}_2026_Ascii.csv"
     route_figure = f".\\Data\\Figures\\1Bar_2Chs"
+
+    # Load fitted data
+    df = pd.read_csv(route_data)
+    df["channels"] = df["channels"].apply(ast.literal_eval)
+
+    RATE = int(round(len(df)/(df['unix_time'].iloc[-1] - df['unix_time'].iloc[0]), 0))
+
+    # ____________________________________________Conditions____________________________________________________
+    # I'll add some conditions to select or discriminate events, it can be based, on raise time or charge or whatever.
+    df = discriminated_df(df, float(trigger))
     
-    main(route_data, route_figure, channel_number)
+    main(df, RATE, route_figure, channel_number)
     
     print("\nEnd of execution.\n")

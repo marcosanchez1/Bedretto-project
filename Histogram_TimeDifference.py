@@ -13,16 +13,7 @@ import ast
 
 from Condition_to_take_event import discriminated_df
 
-def main(route_data, route_figure, trigger): 
-    df = pd.read_csv(route_data)
-    df["channels"] = df["channels"].apply(ast.literal_eval)
-
-    # compute rate
-    RATE = len(df['unix_time'])/(df['unix_time'].iloc[-1] - df['unix_time'].iloc[0])
-    
-    # ____________________________________________Conditions____________________________________________________
-    # I'll add some conditions to select or discriminate events, it can be based, on raise time or charge or whatever.
-    df = discriminated_df(df, trigger)
+def main(df, RATE, route_figure):
 
     TIME_DIFF = [row[0]['t_10'] - row[1]['t_10'] for row in df['channels']]
 
@@ -34,7 +25,7 @@ def main(route_data, route_figure, trigger):
              alpha=0.7,
              range=[-11,11],
              label=f'bins={bins};rate={int(round(RATE,0))}events/s')
-    plt.xlabel('Time Difference (ns)')
+    plt.xlabel('Time Difference (t0 - t1 in ns)')
     plt.ylabel('Frequency')
     plt.title(f'Time Difference Distribution (samples={len(TIME_DIFF)})')
     plt.legend()
@@ -47,6 +38,7 @@ def main(route_data, route_figure, trigger):
 
 if __name__ == "__main__":
     voltage = '-0.920' # In 58 we just begin to distinguish the muon mountain
+    trigger = '0.05' # in volts.
     run = 1
     day = 31
     month = 3
@@ -55,7 +47,17 @@ if __name__ == "__main__":
     route_data = f".\\Data\\Processed_data\\1Bar_2Chs\\57V_varying_gatelength_and_trigger_only\\Run_{voltage}V_Run{run}_Data_{month}_{day}_2026_Ascii.csv"
     
     route_figure = f".\\Data\\Figures\\1Bar_2Chs"
+
+    df = pd.read_csv(route_data)
+    df["channels"] = df["channels"].apply(ast.literal_eval)
+
+    # compute rate
+    RATE = len(df['unix_time'])/(df['unix_time'].iloc[-1] - df['unix_time'].iloc[0])
     
-    main(route_data, route_figure)
+    # ____________________________________________Conditions____________________________________________________
+    # I'll add some conditions to select or discriminate events, it can be based, on raise time or charge or whatever.
+    df = discriminated_df(df, float(trigger))
+    
+    main(df, RATE, route_figure)
 
     print("\nEnd of execution.\n")

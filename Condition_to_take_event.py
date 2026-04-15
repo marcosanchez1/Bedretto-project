@@ -12,11 +12,11 @@ def discriminated_df(df, trigger)->pd.DataFrame:
     
     # Example condition: select events with charge above 0.5 V*ns in channel 0 and below 0.5 V*ns in channel 1.
     threshold_ch0 = trigger 
-    threshold_ch1 = trigger*(1/5)
+    threshold_ch1 = trigger*(6/5)
     
     # We'll use as reference the amplitude of the signal aka A0. For example this condition takes events were A0
     # of channel 0 is above the trigger and A0 of channel 1 is above a certain value that we'll modify.
-    discriminated_df = df[(df['channels'].apply(lambda row: row[0]['fit_parameters'][0] > threshold_ch0)) & 
-                         (df['channels'].apply(lambda row: row[1]['fit_parameters'][0] > threshold_ch1))]
+    new_df = df[(df['channels'].apply(lambda row: row[0]['fit_parameters'][0] >= threshold_ch0)) & 
+                         (df['channels'].apply(lambda row: row[1]['fit_parameters'][0] >= threshold_ch1))]
     
-    return discriminated_df
+    return new_df

@@ -46,8 +46,8 @@ def main(df, RATE, route_figure, channel_number):
 
     N = 2
     n_bins = int(round(N * np.sqrt(len(data['time_difference'])),0))
-    time_limits = [min(data['time_difference']), max(data['time_difference'])]
-    RiseTime_limits = [min(data[rise_time_key]), max(data[rise_time_key])]
+    time_limits = [-11, 11]
+    RiseTime_limits = [min(data[rise_time_key]), 10]
     h = plt.hist2d(
                    data['time_difference'],
                    data[rise_time_key],

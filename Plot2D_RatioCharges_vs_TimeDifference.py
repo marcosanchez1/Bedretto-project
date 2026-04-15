@@ -65,6 +65,7 @@ def main(df, RATE, route_figure):
     plt.savefig(f"{route_figure}\\Charge_Ratio_vs_Time_Difference.png")
     #plt.show()
 
+# This is in case we want to run this script alone.
 if __name__ == "__main__":
     Voltage = '57'
     trigger = '0.05' # in volts.

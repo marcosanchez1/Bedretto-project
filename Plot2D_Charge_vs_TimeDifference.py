@@ -72,6 +72,7 @@ def main(df, RATE, route_figure, channel_number):
 
     return 0
 
+# This is in case we want to run this script alone.
 if __name__ == "__main__":
     voltage = '57' # In 58 we just begin to distinguish the muon mountain
     trigger = '0.05' # in volts.

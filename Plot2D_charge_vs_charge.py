@@ -8,13 +8,8 @@ from Condition_to_take_event import discriminated_df
 def main(df, RATE, route_figure):
 
     data = {'charge_0':[], 'charge_1':[]}
-    for i in range(len(df['channels'])):
-        # ____________________________________________Conditions____________________________________________________
-        # I'll add some conditions to select or discriminate events, it can be based, on raise time or charge or whatever.
-        t_0 = df['channels'].iloc[i][0]['t_10']
-        t_1 = df['channels'].iloc[i][1]['t_10']
-        time_difference = t_0 - t_1
 
+    for i in range(len(df['channels'])):
         charge_0 = df['channels'].iloc[i][0]['charge']
         charge_1 = df['channels'].iloc[i][1]['charge']
         
@@ -22,7 +17,6 @@ def main(df, RATE, route_figure):
         data['charge_1'].append(charge_1)
 
 
-    # Now let's just plot tL vs tR
     plt.figure(figsize=(8,5))
 
     n_bins = int(round(np.sqrt(len(data['charge_0'])),0))
@@ -42,6 +36,7 @@ def main(df, RATE, route_figure):
     plt.savefig(f"{route_figure}\\Charge_1_vs_Charge_0.png")
     #plt.show()
 
+# This is in case we want to run this script alone.
 if __name__ == "__main__":
     Voltage = '57'
     trigger = '0.05' # in volts.

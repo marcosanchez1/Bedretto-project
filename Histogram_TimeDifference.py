@@ -24,7 +24,7 @@ def main(df, RATE, route_figure):
              bins=bins,
              alpha=0.7,
              range=[-11,11],
-             label=f'bins={bins};rate={int(round(RATE,0))}events/s')
+             label=f'bins={bins};rate={int(round(RATE,0))}Hz')
     plt.xlabel('Time Difference (t0 - t1 in ns)')
     plt.ylabel('Frequency')
     plt.title(f'Time Difference Distribution (samples={len(TIME_DIFF)})')

@@ -63,7 +63,7 @@ def main(df, RATE, route_figure, channel_number):
     plt.ylabel(f'Charge-{channel_number} (V*ns)') #I shouldn't call it time of arrival it may generate confusion
     plt.xlabel('Time Difference(t0 - t1; in ns)')
     plt.colorbar(h[3], label="Counts")
-    plt.title(f"Charge-{channel_number} vs Time Difference. bins={n_bins};rate={RATE};events={len(data['time_difference'])}")
+    plt.title(f"Charge-{channel_number} vs Time Difference. bins={n_bins};rate={RATE}Hz;events={len(data['time_difference'])}")
     plt.grid(True)
     plt.tight_layout()
     

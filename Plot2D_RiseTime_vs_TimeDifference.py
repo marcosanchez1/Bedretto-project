@@ -58,7 +58,7 @@ def main(df, RATE, route_figure, channel_number):
     plt.ylabel(f'Rise Time Ch_{channel_number} (t_90% - t_10%; in ns)')
     plt.xlabel('Time Difference(t0 - t1; in ns)')
     plt.colorbar(h[3], label="Counts")
-    plt.title(f"Rise Time Ch_{channel_number} vs Time Difference. bins={n_bins};rate={RATE};events={len(data['time_difference'])}")
+    plt.title(f"Rise Time Ch_{channel_number} vs Time Difference. bins={n_bins};rate={RATE}Hz;events={len(data['time_difference'])}")
     plt.grid(True)
     plt.tight_layout()
     

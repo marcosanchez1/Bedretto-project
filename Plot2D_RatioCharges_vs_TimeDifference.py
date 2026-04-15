@@ -58,7 +58,7 @@ def main(df, RATE, route_figure):
     plt.ylabel('Charge Ratio(charge0/charge1)') #I shouldn't call it time of arrival it may generate confusion
     plt.xlabel('Time Difference(t0 - t1; in ns)')
     plt.colorbar(h[3], label="Counts")
-    plt.title(f"Charge Ratio vs Time Difference. bins={n_bins};rate={RATE};events={len(data['time_difference'])}")
+    plt.title(f"Charge Ratio vs Time Difference. bins={n_bins};rate={RATE}Hz;events={len(data['time_difference'])}")
     plt.grid(True)
     plt.tight_layout()
     

@@ -23,11 +23,11 @@ from Histogram_TimeDifference import main as histogram_time_difference
 
 def main():
     voltage = '57' # In 58 we just begin to distinguish the muon mountain
-    run = '1'
+    run = '5'
     gate_length = '15' # in ns
-    trigger = '0.05' # in volts.
-    day = '9'
-    month = '3'
+    trigger = '0.02' # in volts.
+    day = '15'
+    month = '4'
 
     # route of data
     route_data = f".\\Data\\Processed_data\\1Bar_2Chs\\Run_{voltage}V_Run{run}_Data_{month}_{day}_2026_Ascii.csv"
@@ -36,15 +36,16 @@ def main():
     #route of folder where to save the figures
     #route_figure = fr".\Plots\1Bar_2Chs\57V_Run1_triggerNormal_0.05_gate_15ns_tr"
     #route_figure = fr".\Plots\1Bar_2Chs\VaryingTriggerGate\{trigger} with {gate_length}ns"
-    route_figure = fr".\Plots\1Bar_2Chs\57V_Run1_triggerNormal_0.05_gate_15ns_tr\Scan_RefCh0_Ch1Above30mV"
+    route_figure = fr".\Plots\1Bar_2Chs\57V_Run5_triggerNormal_Trigger_0.02_Source_Ch1"
 
     df = pd.read_csv(route_data)
     df["channels"] = df["channels"].apply(ast.literal_eval)
 
     # compute rate
     RATE = len(df['unix_time'])/(df['unix_time'].iloc[-1] - df['unix_time'].iloc[0])
+    RATE = int(round(RATE, 0))
 
-    df = discriminated_df(df, float(trigger))
+    #df = discriminated_df(df, float(trigger))
 
     # Make all the plots
     charge_histogram(df, RATE, route_figure)

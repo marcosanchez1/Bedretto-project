@@ -43,7 +43,7 @@ def main(df, RATE, route_figure):
             bins=bins1,
             alpha=0.7,
             range=[bot_lim, sup_lim],
-            label=f'bins={bins1};rate={int(round(RATE,0))}events/s'
+            label=f'bins={bins1};rate={int(round(RATE,0))}Hz'
             )
     ax1.set_title(f"Charge(Integral) Distribution - Ch0 (samples={len(charge_ch0)})")
     ax1.set_xlabel("Charge (V*ns)")
@@ -58,7 +58,7 @@ def main(df, RATE, route_figure):
             bins=bins2,
             range=[bot_lim, sup_lim], 
             alpha=0.7, 
-            label=f'bins={bins2};rate={int(round(RATE,0))}events/s'
+            label=f'bins={bins2};rate={int(round(RATE,0))}Hz'
             )
     ax2.set_title(f"Charge(Integral) Distribution - Ch1 (samples={len(charge_ch1)})")
     ax2.set_xlabel("Charge (V*ns)")

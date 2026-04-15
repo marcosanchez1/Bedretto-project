@@ -11,7 +11,7 @@ import numpy as np
 import pandas as pd
 import ast
 
-from Condition_to_take_event import discriminated_df
+from Functions import discriminated_df
 
 def main(df, RATE, route_figure): 
     #I may get negative values if we put an offset that moves the signal below the x-axis and I guess it makes sens

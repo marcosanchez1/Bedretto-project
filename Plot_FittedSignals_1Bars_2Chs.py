@@ -13,6 +13,8 @@ import matplotlib.animation as animation
 import numpy as np
 import pandas as pd
 import ast
+
+# My proper scripts
 from Functions import get_raw_data
 
 dt = 0.312 # multiply sample_i by this to get it in ns
@@ -41,9 +43,9 @@ def f(t, A):
 def main():
     Voltage = '57'
     trigger_oscilloscope = -0.950
-    run = 0
-    day = 16 # For some reason for day 16 we have 272 samples in the raw files? It's not something I did I checked, the raw files simply are like that.
-    month = 3
+    run = 4
+    day = 15 # For some reason for day 16 we have 272 samples in the raw files? It's not something I did I checked, the raw files simply are like that.
+    month = 4
 
     # Load raw data
     #df_raw = get_raw_data(f".\\Data\\Raw_data\\1Bar_2Chs\\57V_varying_gatelength_and_trigger_only\\Run_{Voltage}V_Run{run}_Data_{month}_{day}_2026_Ascii.dat")
@@ -73,7 +75,6 @@ def main():
     mean_baseline_1 = np.mean(mean_baseline_1)
 
     # Time axis (sample index)
-    print(len(raw_ch0[0]))
     t_full = np.arange(len(raw_ch0[0])) * dt
 
     # ---------------------------------------------------------
@@ -139,12 +140,16 @@ def main():
 
     frames_to_animate = []
     for i in range(len(fit_ch0)):
-        t0 = df_fit["channels"].iloc[i][0]['t_10'] # We take the t_10 of the first channel as reference time for the event.
-        t1 = df_fit["channels"].iloc[i][1]['t_10'] # We take the t_10 of the second channel as reference time for the event.
-        time_difference = t0 - t1
+        amplitude_ch0 = np.max(raw_ch0[i])
+        amplitude_ch0_fit = fit_ch0[i][0] # A0 is the amplitude of the fit
 
-        if True:#time_difference < -9: # We choose which events/frames to animate based on this condition in the time of signals.
+        if amplitude_ch0 <= 0.02:
+            print(":p")
             frames_to_animate.append(i)
+        if amplitude_ch0_fit <= 0.02:
+            print(":D")
+            frames_to_animate.append(i)
+        
 
     ani = animation.FuncAnimation(
         fig,

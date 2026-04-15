@@ -23,7 +23,7 @@ from Histogram_TimeDifference import main as histogram_time_difference
 
 def main():
     voltage = '57' # In 58 we just begin to distinguish the muon mountain
-    run = '5'
+    run = '4'
     gate_length = '15' # in ns
     trigger = '0.02' # in volts.
     day = '15'
@@ -36,7 +36,7 @@ def main():
     #route of folder where to save the figures
     #route_figure = fr".\Plots\1Bar_2Chs\57V_Run1_triggerNormal_0.05_gate_15ns_tr"
     #route_figure = fr".\Plots\1Bar_2Chs\VaryingTriggerGate\{trigger} with {gate_length}ns"
-    route_figure = fr".\Plots\1Bar_2Chs\57V_Run4_triggerNormal_Trigger_0.02_Source_Ch0\Scan_RefCh0_Ch1Above10mV"
+    route_figure = fr".\Plots\1Bar_2Chs\57V_Run4_triggerNormal_Trigger_0.02_Source_Ch0\Scan_RefCh0_Ch1Above0mV"
 
     df = pd.read_csv(route_data)
     df["channels"] = df["channels"].apply(ast.literal_eval)

@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 import ast
 
-from Condition_to_take_event import discriminated_df
+from Functions import discriminated_df
 
 def main(df, RATE, route_figure):
 

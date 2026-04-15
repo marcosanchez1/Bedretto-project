@@ -11,7 +11,7 @@ import ast
 import pandas as pd
 
 # Scripts I did
-from Condition_to_take_event import discriminated_df # discriminated events
+from Functions import discriminated_df # discriminated events
 
 # Scripts I did for plotting and saving plots
 from Histograms1D_Charge_amplitudes_mk1 import main as charge_histogram
@@ -36,7 +36,7 @@ def main():
     #route of folder where to save the figures
     #route_figure = fr".\Plots\1Bar_2Chs\57V_Run1_triggerNormal_0.05_gate_15ns_tr"
     #route_figure = fr".\Plots\1Bar_2Chs\VaryingTriggerGate\{trigger} with {gate_length}ns"
-    route_figure = fr".\Plots\1Bar_2Chs\57V_Run5_triggerNormal_Trigger_0.02_Source_Ch1"
+    route_figure = fr".\Plots\1Bar_2Chs\57V_Run4_triggerNormal_Trigger_0.02_Source_Ch0\Scan_RefCh0_Ch1Above10mV"
 
     df = pd.read_csv(route_data)
     df["channels"] = df["channels"].apply(ast.literal_eval)
@@ -45,7 +45,7 @@ def main():
     RATE = len(df['unix_time'])/(df['unix_time'].iloc[-1] - df['unix_time'].iloc[0])
     RATE = int(round(RATE, 0))
 
-    #df = discriminated_df(df, float(trigger))
+    df = discriminated_df(df, float(trigger))
 
     # Make all the plots
     charge_histogram(df, RATE, route_figure)

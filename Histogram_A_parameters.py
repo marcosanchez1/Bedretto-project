@@ -13,28 +13,36 @@ from Functions import discriminated_df
 
 def main(df, RATE, route_figure):
 
-    TIME_DIFF = [row[0]['t_10'] - row[1]['t_10'] for row in df['channels']]
-    #TIME_DIFF = [row[0]['fit_parameters'][1] - row[1]['fit_parameters'][1] for row in df['channels']]
+    # create a matrix with 6 rows(0,1,2,3,..,5) of empty lists that we'll fill
+    A = [[[] for i in range(6)], [[] for i in range(6)]]
 
-    bins = int(round(2 * np.sqrt(len(TIME_DIFF)),0))
+    for row in df['channels']:
+        for i in range(6):
+            for j in range(2):
+                A[j][i].append(row[0]['fit_parameters'][i])
 
-    plt.figure(figsize=(8,5))
-    plt.hist(TIME_DIFF,
-             bins=bins,
-             alpha=0.7,
-             range=[min(TIME_DIFF),max(TIME_DIFF)],
-             label=f'bins={bins};rate={int(round(RATE,0))}Hz',
-             density = False
-             )
-    plt.xlabel('Time Difference (t0 - t1 in ns)')
-    plt.ylabel('Counts')
-    plt.title(f'Time Difference Distribution (samples={len(TIME_DIFF)})')
-    plt.legend()
-    plt.grid(True)
-    plt.tight_layout()
-    plt.savefig(f"{route_figure}\\Time_Difference_histogram.png")
-    plt.close()
-    #plt.show()
+    for i in range(6):
+        for j in range(2):
+            a = A[j][i] # j=channel, i=parameter number(0,1,2,...,5)
+            bins = int(round(2 * np.sqrt(len(a)),0))
+
+            plt.figure(figsize=(8,5))
+            plt.hist(a,
+                    bins=bins,
+                    alpha=0.7,
+                    range=[min(a),max(a)],
+                    label=f'bins={bins};rate={int(round(RATE,0))}Hz',
+                    density = False
+                    )
+            plt.xlabel(f'A{i}')
+            plt.ylabel('Counts')
+            plt.title(f'A{i} fit parameter - CH{j} (samples={len(a)})')
+            plt.legend()
+            plt.grid(True)
+            plt.tight_layout()
+            plt.savefig(f"{route_figure}\\A{i}_histogram_CH{j}.png")
+            plt.close()
+            #plt.show()
     
     return 0
 

@@ -43,12 +43,13 @@ def main(df, RATE, route_figure, channel_number):
              density = False
              )
     plt.xlabel('FWHM (ns)')
-    plt.ylabel('Frequency')
+    plt.ylabel('Counts')
     plt.title(f'FWHM Distribution CH{channel_number} (samples={len(FWHM)})')
     plt.legend()
     plt.grid(True)
     plt.tight_layout()
     plt.savefig(f"{route_figure}\\FWHM_CH{channel_number}_histogram.png")
+    plt.close()
     #plt.show()
 
 # This if is in case we want to run this script alone.

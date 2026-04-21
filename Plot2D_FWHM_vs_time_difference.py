@@ -55,9 +55,9 @@ def main(df, RATE, route_figure, channel_number):
     plt.title(f"FWHM CH{channel_number} vs Time Difference. bins={n_bins};rate={RATE}Hz;events={len(data['time_difference'])}")
     plt.grid(True)
     plt.tight_layout()
-    
     plt.savefig(f"{route_figure}\\FWHM_CH{channel_number}_vs_TimeDifference.png")
     #plt.show()
+    plt.close()
 
 # This if is in case we want to run this script alone.
 if __name__ == "__main__":

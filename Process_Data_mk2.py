@@ -46,7 +46,8 @@ from multiprocessing import Pool, cpu_count
 
 # This dt is the time spacing between samples, we multiply the sample number by this
 # to know the position in time of the sample.
-dt = 0.312 # multiply by this to get it in ns, in the software it just says 312ps not 312.5ps.
+dt = 0.3125 # multiply by this to get it in ns, in the software it just says 312ps but should use 312.5ps
+max_sample_number = 1024
 
 # We will perform the fit until peak + 30 samples more,
 WINDOW = 30 * dt
@@ -163,14 +164,15 @@ def parse_wavecatcher_file(path):
         if params is not None:
             A = params.tolist()
             charge = float(charge)
-            t_10 = get_t(params, 0.1)
-            t_90 = get_t(params, 0.9)
+            t_10 = get_t(A, 0.1)
+            t_90 = get_t(A, 0.9)
             FWHM = get_FWHM(A)
 
             events[ev_index]["channels"][ch_id]["fit_parameters"] = A
             events[ev_index]["channels"][ch_id]["charge"] = charge
-            events[ev_index]["channels"][ch_id]['t_10'] = t_10
             events[ev_index]["channels"][ch_id]['FWHM'] = FWHM
+            events[ev_index]["channels"][ch_id]['t_10'] = t_10
+
             if t_90 is not None and not np.isnan(t_90):
                 events[ev_index]["channels"][ch_id]['t_90'] = t_90
             else:
@@ -187,6 +189,7 @@ def parse_wavecatcher_file(path):
             events[ev_index]["channels"][ch_id]["charge"] = None
             events[ev_index]["channels"][ch_id]['t_10'] = None
             events[ev_index]["channels"][ch_id]['t_90'] = None
+            events[ev_index]["channels"][ch_id]['FWHM'] = None
 
         del events[ev_index]["channels"][ch_id]["_samples"]
 
@@ -304,8 +307,8 @@ def get_t(A, fraction):
     return t[idx[0]] #returns nan if no crossing found.
 
 def get_FWHM(A):
-    # Build a fine time axis around the pulse
-    t = np.linspace(A[1] - 5*A[3], A[1] + 5*A[5], 3000)
+    # Build a fine time axis, I thought of just using all of the possible time domain.
+    t = np.linspace(0, max_sample_number*dt, 3000)
 
     # Evaluate waveform
     y = f(t, A)
@@ -316,8 +319,11 @@ def get_FWHM(A):
 
     # Find indices where waveform crosses the half-maximum
     idx = np.where(y >= half)[0]
+
+    # For some reason on run 0 with 57V it always entered here, the only pattern I saw was that the
+    # time domain of the wf was not complete it didn't have the 1024.
     if len(idx) < 2:
-        return np.nan   # no valid FWHM
+        return None   # no valid FWHM
 
     # Left and right crossing times
     t_left = t[idx[0]]

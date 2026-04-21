@@ -56,9 +56,9 @@ def main(df, RATE, route_figure):
     plt.title(f"Amplitude Ratio vs Time Difference. bins={n_bins};rate={RATE}Hz;events={len(data['time_difference'])}")
     plt.grid(True)
     plt.tight_layout()
-    
     plt.savefig(f"{route_figure}\\Amplitude_Ratio_vs_Time_Difference.png")
     #plt.show()
+    plt.close()
 
 # This is in case we want to run this script alone.
 if __name__ == "__main__":

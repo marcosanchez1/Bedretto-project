@@ -61,15 +61,15 @@ def main(df, RATE, route_figure, channel_number):
                    cmap="turbo",
                    range = [time_limits,charge_limits]
                    )
-    plt.ylabel(f'Charge-{channel_number} (V*ns)') #I shouldn't call it time of arrival it may generate confusion
+    plt.ylabel(f'Charge-{channel_number} (ADC*ns)') #I shouldn't call it time of arrival it may generate confusion
     plt.xlabel('Time Difference(t0 - t1; in ns)')
     plt.colorbar(h[3], label="Counts")
     plt.title(f"Charge-{channel_number} vs Time Difference. bins={n_bins};rate={RATE}Hz;events={len(data['time_difference'])}")
     plt.grid(True)
     plt.tight_layout()
-    
     plt.savefig(f"{route_figure}\\Charge-{channel_number}_vs_TimeDifference.png")
     #plt.show()
+    plt.close()
 
     return 0
 

@@ -52,10 +52,10 @@ def status(A,samples):
 
 def main():
     Voltage = '57'
-    trigger_oscilloscope = 0.02
-    run = 5
-    day = 15 # For some reason for day 16 we have 272 samples in the raw files? It's not something I did I checked, the raw files simply are like that.
-    month = 4
+    trigger_oscilloscope = 0.05
+    run = 0
+    day = 16 # For some reason for day 16 we have 272 samples in the raw files? It's not something I did I checked, the raw files simply are like that.
+    month = 3
 
     # Load raw data
     #df_raw = get_raw_data(f".\\Data\\Raw_data\\1Bar_2Chs\\57V_varying_gatelength_and_trigger_only\\Run_{Voltage}V_Run{run}_Data_{month}_{day}_2026_Ascii.dat")
@@ -154,8 +154,8 @@ def main():
         t1 = df_fit["channels"].iloc[i][1]['t_10']
         time_difference = t0 - t1
 
-        if time_difference < -9:
-            frames_to_animate.append(i)
+        #if time_difference < -9:
+        frames_to_animate.append(i)
         
 
     ani = animation.FuncAnimation(

@@ -74,8 +74,8 @@ def discriminated_df(df, trigger)->pd.DataFrame:
     # This is just an example, you can modify the conditions as you see fit.
     
     # Example condition: select events with charge above 0.5 V*ns in channel 0 and below 0.5 V*ns in channel 1.
-    threshold_ch0 = trigger * 1
-    threshold_ch1 = trigger * 0
+    threshold_ch0 = trigger * 0
+    threshold_ch1 = trigger * 1
     
     # We'll use as reference the amplitude of the signal aka A0. For example this condition takes events were A0
     # of channel 0 is above the trigger and A0 of channel 1 is above a certain value that we'll modify.
@@ -83,14 +83,16 @@ def discriminated_df(df, trigger)->pd.DataFrame:
                          (df['channels'].apply(lambda row: row[1]['fit_parameters'][0] >= threshold_ch1))]
     
     # Basically this region of rise time where it's flat
-    new_df = new_df[new_df['channels'].apply(lambda row: np.abs(row[0]['t_10']-row[1]['t_10']) <= 2.5)]
+    new_df = new_df[new_df['channels'].apply(lambda row: abs(row[0]['t_10']-row[1]['t_10']) <= 11)]
+    new_df = new_df[new_df['channels'].apply(lambda row: abs(row[0]['t_90']-row[1]['t_90']) <= 11)]
+
 
     return new_df
 def status(row_fit_CH0, row_fit_CH1, samples_CH0, samples_CH1)->bool:
     
     A_CH0 = row_fit_CH0['fit_parameters']
     A_CH1 = row_fit_CH1['fit_parameters']
-    
+
     dt = 0.3125
     max_number_samples = 1024
 

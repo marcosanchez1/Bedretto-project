@@ -29,8 +29,8 @@ def main(df, RATE, route_figure):
                    cmap="turbo",
                    range = [charge0_limits, charge1_limits]
                    )
-    plt.xlabel('Charge CH0 (V*ns)')
-    plt.ylabel('Charge CH1 (V*ns)') #I shouldn't call it time of arrival it may generate confusion
+    plt.xlabel('Charge CH0 (ADC*ns)')
+    plt.ylabel('Charge CH1 (ADC*ns)') #I shouldn't call it time of arrival it may generate confusion
     plt.colorbar(h[3], label="Counts")
     plt.title(f"Charge CH0 vs Charge CH1. bins={n_bins};rate={RATE}Hz;events={len(data['charge_0'])}")
     plt.grid(True)
@@ -38,6 +38,7 @@ def main(df, RATE, route_figure):
     plt.tight_layout()
     plt.savefig(f"{route_figure}\\Charge_CH1_vs_Charge_CH0.png")
     #plt.show()
+    plt.close()
 
 # This is in case we want to run this script alone.
 if __name__ == "__main__":

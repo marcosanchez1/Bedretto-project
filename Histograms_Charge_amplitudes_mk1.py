@@ -46,8 +46,8 @@ def main(df, RATE, route_figure):
             label=f'bins={bins1};rate={int(round(RATE,0))}Hz'
             )
     ax1.set_title(f"Charge(Integral) Distribution - Ch0 (samples={len(charge_ch0)})")
-    ax1.set_xlabel("Charge (V*ns)")
-    ax1.set_ylabel("Frequency")
+    ax1.set_xlabel("Charge (ADC*ns)")
+    ax1.set_ylabel("Counts")
     ax1.legend()
     ax1.grid(True)
 
@@ -61,8 +61,8 @@ def main(df, RATE, route_figure):
             label=f'bins={bins2};rate={int(round(RATE,0))}Hz'
             )
     ax2.set_title(f"Charge(Integral) Distribution - Ch1 (samples={len(charge_ch1)})")
-    ax2.set_xlabel("Charge (V*ns)")
-    ax2.set_ylabel("Frequency")
+    ax2.set_xlabel("Charge (ADC*ns)")
+    ax2.set_ylabel("Counts")
     ax2.legend()
     ax2.grid(True)
 
@@ -78,8 +78,8 @@ def main(df, RATE, route_figure):
             )
     ax3.set_title(f"Amplitude(A0) Distribution - Ch0 (samples={len(max_V0)})")
     ax3.legend()
-    ax3.set_ylabel("Frequency")
-    ax3.set_xlabel("A0 (V)")
+    ax3.set_ylabel("Counts")
+    ax3.set_xlabel("A0 (ADC)")
     ax3.grid(True)
 
     sup_lim = max(max_V1)
@@ -93,12 +93,13 @@ def main(df, RATE, route_figure):
             )
     ax4.set_title(f"Amplitude(A0) Distribution - Ch1 (samples={len(max_V1)})")
     ax4.legend()
-    ax4.set_ylabel("Frequency")
-    ax4.set_xlabel("A0 (V)")
+    ax4.set_ylabel("Counts")
+    ax4.set_xlabel("A0 (ADC)")
     ax4.grid(True)
 
     plt.tight_layout()
     plt.savefig(f"{route_figure}\\Charge_and_Amplitude_Distributions.png")
+    plt.close()
     #plt.show()
     
     return 0

@@ -33,7 +33,7 @@ def main():
     month = '4'
 
     #route of folder where to save the figures
-    route_figure = fr".\Plots\1Bar_2Chs\57V_Run5_triggerNormal_Trigger_0.02_Source_Ch1"
+    route_figure = fr".\Plots\1Bar_2Chs\Tests"
 
     # route of data
     route_fit_data = f".\\Data\\Processed_data\\1Bar_2Chs\\Run_{voltage}V_Run{run}_Data_{month}_{day}_2026_Ascii.csv"

@@ -70,7 +70,7 @@ def main(df, RATE, route_figure, channel_number):
         # We append the values of t
         data['time_difference'].append(time_difference)
         
-        A = df['channels'].iloc[i][0]['fit_parameters']
+        A = df['channels'].iloc[i][channel_number]['fit_parameters']
         FWHM = get_FWHM(A)
         #RiseTime = df['channels'].iloc[i][channel_number]['fit_parameters'][1] - df['channels'].iloc[i][channel_number]['t_10']
         
@@ -82,8 +82,8 @@ def main(df, RATE, route_figure, channel_number):
 
     N = 2
     n_bins = int(round(N * np.sqrt(len(data['time_difference'])),0))
-    time_limits = [-12, 12]
-    FWHM_limits = [min(data[FWHM_key]), 10]
+    time_limits = [min(data['time_difference']), max(data['time_difference'])]
+    FWHM_limits = [min(data[FWHM_key]), max(data[FWHM_key])]
     h = plt.hist2d(
                    data['time_difference'],
                    data[FWHM_key],
@@ -91,7 +91,7 @@ def main(df, RATE, route_figure, channel_number):
                    cmap="turbo",
                    range=[time_limits, FWHM_limits]
                    )
-    plt.ylabel(f'FWHM CH{channel_number} (t_90% - t_10%; in ns)')
+    plt.ylabel(f'FWHM CH{channel_number} (ns)')
     plt.xlabel('Time Difference(t0 - t1; in ns)')
     plt.colorbar(h[3], label="Counts")
     plt.title(f"FWHM CH{channel_number} vs Time Difference. bins={n_bins};rate={RATE}Hz;events={len(data['time_difference'])}")

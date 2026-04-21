@@ -53,7 +53,7 @@ def main(df, RATE, route_figure):
                    data['charge_ratio'],
                    bins=n_bins,
                    cmap="turbo",
-                   range = [[-12, 12], [min(data['charge_ratio']), max(data['charge_ratio'])]]
+                   range = [[min(data['time_difference']), max(data['time_difference'])], [min(data['charge_ratio']), max(data['charge_ratio'])]]
                    )
     plt.ylabel('Charge Ratio(charge0/charge1)') #I shouldn't call it time of arrival it may generate confusion
     plt.xlabel('Time Difference(t0 - t1; in ns)')

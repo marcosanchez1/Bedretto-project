@@ -1,6 +1,4 @@
 '''
-In this script I'll just compute the histograms of the charge distributions using the fitted values
-for both channels so far I've been just working with channel 0 and 1 so I'll just stick to that.
 The structure of the data is as follows:
 channel,unix_time
 {0:{fit_parameters:[A0,A1,...],charge:charge_0,t_10: t_10,t_90:t_90},1:{0:{fitting_parameters:[A0,A1,...],charge:charge_0,t_10: t_10,t_90:t_90}},unix_time_0
@@ -24,7 +22,7 @@ def main(df, RATE, route_figure):
     plt.hist(TIME_DIFF,
              bins=bins,
              alpha=0.7,
-             range=[-12,12],
+             range=[min(TIME_DIFF),max(TIME_DIFF)],
              label=f'bins={bins};rate={int(round(RATE,0))}Hz',
              density = False
              )

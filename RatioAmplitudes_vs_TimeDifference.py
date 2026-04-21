@@ -48,7 +48,7 @@ def main(df, RATE, route_figure):
                    data['amplitude_ratio'],
                    bins=n_bins,
                    cmap="turbo",
-                   range = [[-12, 12], [min(data['amplitude_ratio']), max(data['amplitude_ratio'])]]
+                   range = [[min(data['time_difference']), max(data['time_difference'])], [min(data['amplitude_ratio']), max(data['amplitude_ratio'])]]
                    )
     plt.ylabel('Amplitude Ratio(A0_CH0/A0_CH1)') #I shouldn't call it time of arrival it may generate confusion
     plt.xlabel('Time Difference(t0 - t1; in ns)')

@@ -86,11 +86,20 @@ def discriminated_df(df, trigger)->pd.DataFrame:
     new_df = new_df[new_df['channels'].apply(lambda row: np.abs(row[0]['t_10']-row[1]['t_10']) <= 2.5)]
 
     return new_df
-def status(A,samples):
-    dt = 0.312
-    real_amplitude = np.max(samples) - np.mean(samples[:100]) # say first 100 values to approximate baseline.
+def status(A_CH0, A_CH1, samples_CH0, samples_CH1):
+    dt = 0.3125
+    max_number_samples = 1024
+
+    if A_CH0[1] <= 0 or A_CH0[1] >= max_number_samples*dt: # It cannot be outside this interval not possible
+        return False
     
-    if A[1] <= 0 or A[1] >= 1024*0.312: # It cannot be outside this interval not possible
+    # The position of the peak is not possible for it to be
+    if A_CH1[1] <= 0 or A_CH1[1] >= max_number_samples * dt: # It cannot be outside this interval not possible
+        return False
+    
+    # the bar's length is 169.8cm and the speed of light inside the material is about 16cm/ns
+    # meaning that if the signal is "good" it shouldn't be more than like 11ns
+    if abs(A_CH0[1] - A_CH1[1]) > 11:
         return False
 
     return True
@@ -104,13 +113,13 @@ def compare_df(df_fit, df_raw):
     for i in range(len(df_fit['channels'])):
         A_CH0 = df_fit['channels'].iloc[i][0]['fit_parameters']
         samples_CH0 = df_raw['channels'].iloc[i][0]
-        status_fit_0 = status(A_CH0, samples_CH0)
 
         A_CH1 = df_fit['channels'].iloc[i][1]['fit_parameters']
         samples_CH1 = df_raw['channels'].iloc[i][1]
-        status_fit_1 = status(A_CH1, samples_CH1)
 
-        if status_fit_0 and status_fit_1:
+        status_fit = status(A_CH0, A_CH1, samples_CH0, samples_CH1)
+
+        if status_fit:
             rows.append(df_fit.iloc[i])
 
     # Build new DataFrame from accepted rows

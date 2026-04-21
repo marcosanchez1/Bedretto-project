@@ -1,12 +1,8 @@
 '''
-In this script I'll try to plot TimeR vs TimeL in a 2D histogram maybe? or simply a plot?
-Federico said that we should only look at the difference in times, he said to look at the difference
-in times at 10% of amplitude but I'll take at the amplitude I think it's easier and the same.
-Also the plot I'm not quite sure but I think I'll do a 2D hi
+The structure of the data is as follows:
 
 channel,unix_time
 {0:{fit_parameters:[A0,A1,...],charge:charge_0,t_10: t_10,t_90:t_90},1:{0:{fitting_parameters:[A0,A1,...],charge:charge_0,t_10: t_10,t_90:t_90}},unix_time_0
-
 
 The meaning of the parameters is in the paper but basically the're A0,A1,A2, etc...
 
@@ -21,71 +17,81 @@ import ast
 
 from Functions import discriminated_df
 
-def main(df, RATE, route_figure):
-
+def main(df, RATE, route_figure, channel_number):
+    
     # time difference = t0 - t1
-    # charge ratio charge0/charge1
-    data = {'time_difference':[], 'charge_ratio':[]}
+    amplitude_key = f'A0_ch{channel_number}'
+    data = {'time_difference':[], amplitude_key:[]}
+
     for i in range(len(df['channels'])):
 
         # Lets get the time at which the signal is at 10% of its
         # max. value.
-        t0 = df['channels'].iloc[i][0]['t_10']
-        t1 = df['channels'].iloc[i][1]['t_10']
+        t0 = df["channels"].iloc[i][0]['t_10'] # We take the t_10 of the first channel as reference time for the event.
+        t1 = df["channels"].iloc[i][1]['t_10'] # We take the t_10 of the second channel as reference time for the event.
+        time_difference = t0 - t1
 
-        charge_ch0 = df['channels'].iloc[i][0]['charge']
-        charge_ch1 = df['channels'].iloc[i][1]['charge']
+        if amplitude_key == 'A0_ch0':
+            amplitude_chN = df["channels"].iloc[i][0]['fit_parameters'][0] # We take the amplitude of the first channel.
+        elif amplitude_key =='A0_ch1':
+            amplitude_chN = df["channels"].iloc[i][1]['fit_parameters'][0] # We take the amplitude of the second channel
 
-        # What else could we have done?
-        if charge_ch1 == 0:
-            continue
-        else:
-            data['charge_ratio'].append(charge_ch0/charge_ch1)
+        if True:#time_difference >= -1 and time_difference <= 1:     
+            # We append the values of t
             data['time_difference'].append(t0 - t1)
-
+            
+            # We append values of amplitude
+            data[amplitude_key].append(amplitude_chN)
 
     # Now let's just plot tL vs tR
     plt.figure(figsize=(8,5))
 
-    n_bins = int(round(np.sqrt(len(data['time_difference'])),0))
+    N = 1
+    n_bins = int(round(N * np.sqrt(len(data['time_difference'])),0))
+    time_limits = [-12, 12]
+    amplitude_limits = [min(data[amplitude_key]), max(data[amplitude_key])]
+    
     h = plt.hist2d(
                    data['time_difference'],
-                   data['charge_ratio'],
+                   data[amplitude_key],
                    bins=n_bins,
                    cmap="turbo",
-                   range = [[-12, 12], [min(data['charge_ratio']), max(data['charge_ratio'])]]
+                   range = [time_limits,amplitude_limits]
                    )
-    plt.ylabel('Charge Ratio(charge0/charge1)') #I shouldn't call it time of arrival it may generate confusion
+    plt.ylabel(f'A0_CH{channel_number} (V)') #I shouldn't call it time of arrival it may generate confusion
     plt.xlabel('Time Difference(t0 - t1; in ns)')
     plt.colorbar(h[3], label="Counts")
-    plt.title(f"Charge Ratio vs Time Difference. bins={n_bins};rate={RATE}Hz;events={len(data['time_difference'])}")
+    plt.title(f"Amplitude(A0)-CH{channel_number} vs Time Difference. bins={n_bins};rate={RATE}Hz;events={len(data['time_difference'])}")
     plt.grid(True)
     plt.tight_layout()
     
-    plt.savefig(f"{route_figure}\\Charge_Ratio_vs_Time_Difference.png")
+    plt.savefig(f"{route_figure}\\Amplitude-{channel_number}_vs_TimeDifference.png")
     #plt.show()
+
+    return 0
 
 # This is in case we want to run this script alone.
 if __name__ == "__main__":
-    Voltage = '57'
+    voltage = '57' # In 58 we just begin to distinguish the muon mountain
     trigger = '0.05' # in volts.
     run = 1
     day = 9
     month = 3
+    channel_number = 0
 
-    route_data = f".\\Data\\Processed_data\\1Bar_2Chs\\Run_{Voltage}V_Run{run}_Data_{month}_{day}_2026_Ascii.csv"
+    route_data = f".\\Data\\Processed_data\\1Bar_2Chs\\Run_{voltage}V_Run{run}_Data_{month}_{day}_2026_Ascii.csv"
     route_figure = f".\\Data\\Figures\\1Bar_2Chs"
 
     # Load fitted data
     df = pd.read_csv(route_data)
     df["channels"] = df["channels"].apply(ast.literal_eval)
-    
+
     RATE = int(round(len(df)/(df['unix_time'].iloc[-1] - df['unix_time'].iloc[0]), 0))
-    
+
     # ____________________________________________Conditions____________________________________________________
     # I'll add some conditions to select or discriminate events, it can be based, on raise time or charge or whatever.
     df = discriminated_df(df, float(trigger))
-
-    main(df, RATE, route_figure)
-
+    
+    main(df, RATE, route_figure, channel_number)
+    
     print("\nEnd of execution.\n")

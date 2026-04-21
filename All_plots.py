@@ -10,8 +10,7 @@ The struture of the processed data is as follows:
 import ast
 import pandas as pd
 
-# Scripts I did
-from Functions import discriminated_df # discriminated events
+from Functions import discriminated_df, compare_df, get_raw_data
 
 # Scripts I did for plotting and saving plots
 from Histograms1D_Charge_amplitudes_mk1 import main as charge_histogram
@@ -20,41 +19,50 @@ from Plot2D_RatioCharges_vs_TimeDifference import main as ratio_charge_vs_time
 from Plot2D_RiseTime_vs_TimeDifference import main as rise_time_vs_time_difference
 from Plot2D_charge_vs_charge import main as charge_vs_charge
 from Histogram_TimeDifference import main as histogram_time_difference
+from Plot2D_Amplitude_vs_TimeDifference import main as amplitude_vs_time_difference
+from RatioAmplitudes_vs_TimeDifference import main as ratio_amplitude_vs_time_difference
+from FWHM_vs_time_difference import main as FWHM_vs_time_difference
 
 def main():
     voltage = '57' # In 58 we just begin to distinguish the muon mountain
-    run = '4'
+    run = '5'
     gate_length = '15' # in ns
+    channel_source = '0'
     trigger = '0.02' # in volts.
     day = '15'
     month = '4'
 
-    # route of data
-    route_data = f".\\Data\\Processed_data\\1Bar_2Chs\\Run_{voltage}V_Run{run}_Data_{month}_{day}_2026_Ascii.csv"
-    #route_data = f".\\Data\\Processed_data\\1Bar_2Chs\\57V_varying_gatelength_and_trigger_only\\Run_{trigger}V_Run{run}_Data_{month}_{day}_2026_Ascii.csv"
-    
     #route of folder where to save the figures
-    #route_figure = fr".\Plots\1Bar_2Chs\57V_Run1_triggerNormal_0.05_gate_15ns_tr"
-    #route_figure = fr".\Plots\1Bar_2Chs\VaryingTriggerGate\{trigger} with {gate_length}ns"
-    route_figure = fr".\Plots\1Bar_2Chs\57V_Run4_triggerNormal_Trigger_0.02_Source_Ch0\Scan_RefCh0_Ch1Above0mV"
+    route_figure = fr".\Plots\1Bar_2Chs\57V_Run5_triggerNormal_Trigger_0.02_Source_Ch1"
 
-    df = pd.read_csv(route_data)
-    df["channels"] = df["channels"].apply(ast.literal_eval)
+    # route of data
+    route_fit_data = f".\\Data\\Processed_data\\1Bar_2Chs\\Run_{voltage}V_Run{run}_Data_{month}_{day}_2026_Ascii.csv"
+    df_fit = pd.read_csv(route_fit_data)
+    df_fit["channels"] = df_fit["channels"].apply(ast.literal_eval)
+
+    # route of original data, will only use it to compare with the fit and discriminate events
+    route_og_data = f".\\Data\\Raw_data\\1Bar_2Chs\\Run_{voltage}V_Run{run}_Data_{month}_{day}_2026_Ascii.dat"
+    df_raw = get_raw_data(route_og_data)
+
+    df = compare_df(df_fit,df_raw)
+
+    #df = discriminated_df(df, float(trigger))
 
     # compute rate
     RATE = len(df['unix_time'])/(df['unix_time'].iloc[-1] - df['unix_time'].iloc[0])
     RATE = int(round(RATE, 0))
 
-    df = discriminated_df(df, float(trigger))
-
     # Make all the plots
     charge_histogram(df, RATE, route_figure)
     ratio_charge_vs_time(df, RATE, route_figure)
+    ratio_amplitude_vs_time_difference(df, RATE, route_figure)
     charge_vs_charge(df, RATE, route_figure)
     histogram_time_difference(df, RATE, route_figure)
     for i in [0,1]:
         main_charge_vs_time(df, RATE, route_figure, i)
         rise_time_vs_time_difference(df, RATE, route_figure, i)
+        amplitude_vs_time_difference(df, RATE, route_figure, i)
+        FWHM_vs_time_difference(df, RATE, route_figure, i)
 
     return 0
 

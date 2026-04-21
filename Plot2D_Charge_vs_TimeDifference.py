@@ -51,8 +51,9 @@ def main(df, RATE, route_figure, channel_number):
 
     N = 1
     n_bins = int(round(N * np.sqrt(len(data['time_difference'])),0))
-    time_limits = [-11, 11]
+    time_limits = [-12, 12]
     charge_limits = [min(data[charge_key]), max(data[charge_key])]
+    
     h = plt.hist2d(
                    data['time_difference'],
                    data[charge_key],

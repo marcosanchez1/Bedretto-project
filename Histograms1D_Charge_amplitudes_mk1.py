@@ -37,7 +37,7 @@ def main(df, RATE, route_figure):
 
     #Plot histograms for charge distributions
     bot_lim = min(charge_ch0)
-    sup_lim = 1.5#max(charge_ch0)
+    sup_lim = max(charge_ch0)
     ax1.hist(
             charge_ch0,
             bins=bins1,
@@ -52,7 +52,7 @@ def main(df, RATE, route_figure):
     ax1.grid(True)
 
     bot_lim = min(charge_ch1)
-    sup_lim = 1.5#max(charge_ch1)
+    sup_lim = max(charge_ch1)
     ax2.hist(
             charge_ch1, 
             bins=bins2,
@@ -76,10 +76,10 @@ def main(df, RATE, route_figure):
             alpha=0.7, 
             label=f'bins={bins3}'
             )
-    ax3.set_title(f"Amplitude Distribution - Ch0 (samples={len(max_V0)})")
+    ax3.set_title(f"Amplitude(A0) Distribution - Ch0 (samples={len(max_V0)})")
     ax3.legend()
     ax3.set_ylabel("Frequency")
-    ax3.set_xlabel("Amplitude (V)")
+    ax3.set_xlabel("A0 (V)")
     ax3.grid(True)
 
     sup_lim = max(max_V1)
@@ -91,10 +91,10 @@ def main(df, RATE, route_figure):
             alpha=0.7, 
             label=f'bins={bins4}'
             )
-    ax4.set_title(f"Amplitude Distribution - Ch1 (samples={len(max_V1)})")
+    ax4.set_title(f"Amplitude(A0) Distribution - Ch1 (samples={len(max_V1)})")
     ax4.legend()
     ax4.set_ylabel("Frequency")
-    ax4.set_xlabel("Amplitude (V)")
+    ax4.set_xlabel("A0 (V)")
     ax4.grid(True)
 
     plt.tight_layout()

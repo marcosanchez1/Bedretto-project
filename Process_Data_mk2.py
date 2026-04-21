@@ -205,7 +205,6 @@ def process_samples(samples):
     # It would be a good idea to check if the fit was performed correctly.
     params = perform_fit(t, samples_np[:end], baseline)
     
-
     return params
 
 @njit

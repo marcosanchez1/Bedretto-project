@@ -38,12 +38,22 @@ def f(t, A):
             denom = 2 * (abs(A4) * tr + A5)**2 + eps
             F[i] = A0 * np.exp(-(tr*tr) / denom) + A6
     return F
+def status(A,samples):
+    real_amplitude = np.max(samples) - np.mean(samples[:100]) # say first 100 values to approximate baseline.
+    
+    if A[1] <= 0:
+        return False
+    if A[0] >= real_amplitude*1.1 or A[0] <= real_amplitude*0.1:
+        return False
+    if A[1] > (np.argmax(samples) + 1) * dt or A[1] < (np.argmax(samples) - 1) * dt:
+        return False
 
+    return True
 
 def main():
     Voltage = '57'
-    trigger_oscilloscope = -0.950
-    run = 4
+    trigger_oscilloscope = 0.02
+    run = 5
     day = 15 # For some reason for day 16 we have 272 samples in the raw files? It's not something I did I checked, the raw files simply are like that.
     month = 4
 
@@ -140,14 +150,11 @@ def main():
 
     frames_to_animate = []
     for i in range(len(fit_ch0)):
-        amplitude_ch0 = np.max(raw_ch0[i])
-        amplitude_ch0_fit = fit_ch0[i][0] # A0 is the amplitude of the fit
+        t0 = df_fit["channels"].iloc[i][0]['t_10']
+        t1 = df_fit["channels"].iloc[i][1]['t_10']
+        time_difference = t0 - t1
 
-        if amplitude_ch0 <= 0.02:
-            print(":p")
-            frames_to_animate.append(i)
-        if amplitude_ch0_fit <= 0.02:
-            print(":D")
+        if time_difference < -9:
             frames_to_animate.append(i)
         
 
@@ -155,7 +162,7 @@ def main():
         fig,
         update,
         frames=frames_to_animate, #From where to where do I plot and in how many steps
-        interval=100, # How much time does the present frame last in ms
+        interval=500, # How much time does the present frame last in ms
         blit=False
     )
     #ani.save("signal_animation_fitted.gif", writer="pillow", fps=5)

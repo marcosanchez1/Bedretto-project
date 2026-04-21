@@ -16,6 +16,7 @@ from Functions import discriminated_df
 def main(df, RATE, route_figure):
 
     TIME_DIFF = [row[0]['t_10'] - row[1]['t_10'] for row in df['channels']]
+    #TIME_DIFF = [row[0]['fit_parameters'][1] - row[1]['fit_parameters'][1] for row in df['channels']]
 
     bins = int(round(2 * np.sqrt(len(TIME_DIFF)),0))
 
@@ -23,8 +24,10 @@ def main(df, RATE, route_figure):
     plt.hist(TIME_DIFF,
              bins=bins,
              alpha=0.7,
-             range=[-11,11],
-             label=f'bins={bins};rate={int(round(RATE,0))}Hz')
+             range=[-12,12],
+             label=f'bins={bins};rate={int(round(RATE,0))}Hz',
+             density = False
+             )
     plt.xlabel('Time Difference (t0 - t1 in ns)')
     plt.ylabel('Frequency')
     plt.title(f'Time Difference Distribution (samples={len(TIME_DIFF)})')

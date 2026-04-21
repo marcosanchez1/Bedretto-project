@@ -20,18 +20,21 @@ def main(df, RATE, route_figure):
     plt.figure(figsize=(8,5))
 
     n_bins = int(round(np.sqrt(len(data['charge_0'])),0))
+    charge0_limits = [min(data['charge_0']), max(data['charge_0'])]
+    charge1_limits = [min(data['charge_1']), max(data['charge_1'])]
     h = plt.hist2d(
                    data['charge_0'],
                    data['charge_1'],
                    bins=n_bins,
                    cmap="turbo",
-                   range = [[min(data['charge_0']), max(data['charge_0'])], [min(data['charge_1']), max(data['charge_1'])]]
+                   range = [charge0_limits, charge1_limits]
                    )
     plt.ylabel('Charge channel-1 (V*ns)') #I shouldn't call it time of arrival it may generate confusion
     plt.xlabel('Charge channel-0 (V*ns)')
     plt.colorbar(h[3], label="Counts")
     plt.title(f"Charge-1 vs Charge-0. bins={n_bins};rate={RATE}Hz;events={len(data['charge_0'])}")
     plt.grid(True)
+    #plt.gca().set_aspect('equal', adjustable='box')
     plt.tight_layout()
     plt.savefig(f"{route_figure}\\Charge_1_vs_Charge_0.png")
     #plt.show()

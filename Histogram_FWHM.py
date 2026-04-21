@@ -18,55 +18,16 @@ import ast
 
 from Functions import discriminated_df
 
-def f(t, A):
-    A0, A1, A2, A3, A4, A5, A6 = A
-    n = t.size
-    F = np.zeros(n)
-    eps = 1e-12
-
-    for i in range(n):
-        ti = t[i]
-        if ti <= A1:
-            tl = ti - A1
-            denom = 2 * (abs(A2) * tl + A3)**2 + eps
-            F[i] = A0 * np.exp(-(tl*tl) / denom) + A6
-        else:
-            tr = ti - A1
-            denom = 2 * (abs(A4) * tr + A5)**2 + eps
-            F[i] = A0 * np.exp(-(tr*tr) / denom) + A6
-    return F
-
-def get_FWHM(A):
-    # Build a fine time axis around the pulse
-    t = np.linspace(A[1] - 5*A[3], A[1] + 5*A[5], 5000)
-
-    # Evaluate waveform
-    y = f(t, A)
-
-    # Maximum and half-maximum
-    y_max = A[0]
-    half = y_max/ 2   # half above baseline
-
-    # Find indices where waveform crosses the half-maximum
-    idx = np.where(y >= half)[0]
-    if len(idx) < 2:
-        return np.nan   # no valid FWHM
-
-    # Left and right crossing times
-    t_left = t[idx[0]]
-    t_right = t[idx[-1]]
-
-    return t_right - t_left
-
 def main(df, RATE, route_figure, channel_number):
     
     # We create the dictionary of data
     FWHM = []
 
     for i in range(len(df['channels'])):
-        
-        A = df['channels'].iloc[i][channel_number]['fit_parameters']
-        FWHM.append(get_FWHM(A))
+        # Just get the pre-computed FWHM
+        fwhm = df['channels'].iloc[i][channel_number]['FWHM']
+        # Append it
+        FWHM.append(fwhm)
 
     # Now let's just plot tL vs tR
     plt.figure(figsize=(8,5))

@@ -127,7 +127,8 @@ def parse_wavecatcher_file(path):
                     "fit_parameters": None,
                     "charge": None,
                     "t_10": None, # Time when signal is at 10% of its amplitude
-                    "t_90": None
+                    "t_90": None,
+                    "FWHM": None
                 }
 
                 current_channel = ch_id
@@ -164,10 +165,12 @@ def parse_wavecatcher_file(path):
             charge = float(charge)
             t_10 = get_t(params, 0.1)
             t_90 = get_t(params, 0.9)
+            FWHM = get_FWHM(A)
 
             events[ev_index]["channels"][ch_id]["fit_parameters"] = A
             events[ev_index]["channels"][ch_id]["charge"] = charge
             events[ev_index]["channels"][ch_id]['t_10'] = t_10
+            events[ev_index]["channels"][ch_id]['FWHM'] = FWHM
             if t_90 is not None and not np.isnan(t_90):
                 events[ev_index]["channels"][ch_id]['t_90'] = t_90
             else:
@@ -299,6 +302,28 @@ def get_t(A, fraction):
     
      # this would be in ns
     return t[idx[0]] #returns nan if no crossing found.
+
+def get_FWHM(A):
+    # Build a fine time axis around the pulse
+    t = np.linspace(A[1] - 5*A[3], A[1] + 5*A[5], 3000)
+
+    # Evaluate waveform
+    y = f(t, A)
+
+    # Maximum and half-maximum
+    y_max = A[0]
+    half = y_max/ 2   # half above baseline
+
+    # Find indices where waveform crosses the half-maximum
+    idx = np.where(y >= half)[0]
+    if len(idx) < 2:
+        return np.nan   # no valid FWHM
+
+    # Left and right crossing times
+    t_left = t[idx[0]]
+    t_right = t[idx[-1]]
+
+    return t_right - t_left
 
 #________________________________________MAIN______________________________________________
 def main():

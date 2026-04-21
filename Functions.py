@@ -86,7 +86,11 @@ def discriminated_df(df, trigger)->pd.DataFrame:
     new_df = new_df[new_df['channels'].apply(lambda row: np.abs(row[0]['t_10']-row[1]['t_10']) <= 2.5)]
 
     return new_df
-def status(A_CH0, A_CH1, samples_CH0, samples_CH1):
+def status(row_fit_CH0, row_fit_CH1, samples_CH0, samples_CH1)->bool:
+    
+    A_CH0 = row_fit_CH0['fit_parameters']
+    A_CH1 = row_fit_CH1['fit_parameters']
+    
     dt = 0.3125
     max_number_samples = 1024
 
@@ -98,8 +102,8 @@ def status(A_CH0, A_CH1, samples_CH0, samples_CH1):
         return False
     
     # the bar's length is 169.8cm and the speed of light inside the material is about 16cm/ns
-    # meaning that if the signal is "good" it shouldn't be more than like 11ns
-    if abs(A_CH0[1] - A_CH1[1]) > 11:
+    # meaning that if the signal is "good" it shouldn't be more than like 10.6125ns
+    if abs(row_fit_CH0['t_10'] - row_fit_CH1['t_10']) > 11:
         return False
 
     return True
@@ -107,17 +111,18 @@ def status(A_CH0, A_CH1, samples_CH0, samples_CH1):
 # The idea of this function is to compare some elements such as amplitude of the fit
 # with the original data and in this way discriminate the events that may not have a
 # good fit.
-def compare_df(df_fit, df_raw):
+def compare_df(df_fit, df_raw)->pd.DataFrame:
     # We assume they're of the same size
     rows = []
     for i in range(len(df_fit['channels'])):
-        A_CH0 = df_fit['channels'].iloc[i][0]['fit_parameters']
+
+        row_fit_CH0 = df_fit['channels'].iloc[i][0]
         samples_CH0 = df_raw['channels'].iloc[i][0]
 
-        A_CH1 = df_fit['channels'].iloc[i][1]['fit_parameters']
+        row_fit_CH1 = df_fit['channels'].iloc[i][1]
         samples_CH1 = df_raw['channels'].iloc[i][1]
 
-        status_fit = status(A_CH0, A_CH1, samples_CH0, samples_CH1)
+        status_fit = status(row_fit_CH0, row_fit_CH1, samples_CH0, samples_CH1)
 
         if status_fit:
             rows.append(df_fit.iloc[i])

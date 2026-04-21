@@ -13,15 +13,16 @@ import pandas as pd
 from Functions import discriminated_df, compare_df, get_raw_data
 
 # Scripts I did for plotting and saving plots
-from Histograms1D_Charge_amplitudes_mk1 import main as charge_histogram
+from Histograms_Charge_amplitudes_mk1 import main as charge_histogram
+from Histogram_TimeDifference import main as histogram_time_difference
+from Histogram_FWHM import main as FWHM_histogram
 from Plot2D_Charge_vs_TimeDifference import main as main_charge_vs_time
 from Plot2D_RatioCharges_vs_TimeDifference import main as ratio_charge_vs_time
 from Plot2D_RiseTime_vs_TimeDifference import main as rise_time_vs_time_difference
 from Plot2D_charge_vs_charge import main as charge_vs_charge
-from Histogram_TimeDifference import main as histogram_time_difference
 from Plot2D_Amplitude_vs_TimeDifference import main as amplitude_vs_time_difference
-from RatioAmplitudes_vs_TimeDifference import main as ratio_amplitude_vs_time_difference
-from FWHM_vs_time_difference import main as FWHM_vs_time_difference
+from Plot2D_RatioAmplitudes_vs_TimeDifference import main as ratio_amplitude_vs_time_difference
+from Plot2D_FWHM_vs_time_difference import main as FWHM_vs_time_difference
 
 def main():
     voltage = '57' # In 58 we just begin to distinguish the muon mountain
@@ -63,6 +64,7 @@ def main():
         rise_time_vs_time_difference(df, RATE, route_figure, i)
         amplitude_vs_time_difference(df, RATE, route_figure, i)
         FWHM_vs_time_difference(df, RATE, route_figure, i)
+        FWHM_histogram(df, RATE, route_figure, i)
 
     return 0
 

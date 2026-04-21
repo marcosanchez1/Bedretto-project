@@ -19,7 +19,6 @@ from Functions import discriminated_df
 
 def main(df, RATE, route_figure, channel_number):
     
-    # time difference = t0 - t1
     amplitude_key = f'A0_ch{channel_number}'
     data = {'time_difference':[], amplitude_key:[]}
 
@@ -31,17 +30,11 @@ def main(df, RATE, route_figure, channel_number):
         t1 = df["channels"].iloc[i][1]['t_10'] # We take the t_10 of the second channel as reference time for the event.
         time_difference = t0 - t1
 
-        if amplitude_key == 'A0_ch0':
-            amplitude_chN = df["channels"].iloc[i][0]['fit_parameters'][0] # We take the amplitude of the first channel.
-        elif amplitude_key =='A0_ch1':
-            amplitude_chN = df["channels"].iloc[i][1]['fit_parameters'][0] # We take the amplitude of the second channel
+        amplitude_chN = df["channels"].iloc[i][channel_number]['fit_parameters'][0] # We take the amplitude of the first channel.
 
-        if True:#time_difference >= -1 and time_difference <= 1:     
-            # We append the values of t
-            data['time_difference'].append(t0 - t1)
-            
-            # We append values of amplitude
-            data[amplitude_key].append(amplitude_chN)
+        data['time_difference'].append(time_difference)    
+        # We append values of amplitude
+        data[amplitude_key].append(amplitude_chN)
 
     # Now let's just plot tL vs tR
     plt.figure(figsize=(8,5))

@@ -73,21 +73,18 @@ def discriminated_df(df, trigger)->pd.DataFrame:
     # For example, we can select only events with a charge above a certain threshold in channel 0 and a charge below a certain threshold in channel 1.
     # This is just an example, you can modify the conditions as you see fit.
     
-    # Example condition: select events with charge above 0.5 V*ns in channel 0 and below 0.5 V*ns in channel 1.
-    threshold_ch0 = trigger * 0
-    threshold_ch1 = trigger * 1
-    
-    # We'll use as reference the amplitude of the signal aka A0. For example this condition takes events were A0
-    # of channel 0 is above the trigger and A0 of channel 1 is above a certain value that we'll modify.
+    # Example condition: select events with charge above 0.5 ADC*ns in channel 0 and below 0.5 ADC*ns in channel 1.
+    threshold_ch0 = trigger * 1
+    threshold_ch1 = trigger * 0
+
     new_df = df[(df['channels'].apply(lambda row: row[0]['fit_parameters'][0] >= threshold_ch0)) & 
                          (df['channels'].apply(lambda row: row[1]['fit_parameters'][0] >= threshold_ch1))]
     
-    # Basically this region of rise time where it's flat
-    new_df = new_df[new_df['channels'].apply(lambda row: abs(row[0]['t_10']-row[1]['t_10']) <= 11)]
-    new_df = new_df[new_df['channels'].apply(lambda row: abs(row[0]['t_90']-row[1]['t_90']) <= 11)]
-
+    new_df = new_df[new_df['channels'].apply(lambda row: row[0]['t_10'] - row[1]['t_10'] > 8)]
 
     return new_df
+
+
 def status(row_fit_CH0, row_fit_CH1, samples_CH0, samples_CH1)->bool:
     
     A_CH0 = row_fit_CH0['fit_parameters']
@@ -96,11 +93,11 @@ def status(row_fit_CH0, row_fit_CH1, samples_CH0, samples_CH1)->bool:
     dt = 0.3125
     max_number_samples = 1024
 
-    if A_CH0[1] <= 0 or A_CH0[1] >= max_number_samples*dt: # It cannot be outside this interval not possible
+    if A_CH0[1] < 0 or A_CH0[1] > max_number_samples*dt: # It cannot be outside this interval not possible
         return False
     
     # The position of the peak is not possible for it to be
-    if A_CH1[1] <= 0 or A_CH1[1] >= max_number_samples * dt: # It cannot be outside this interval not possible
+    if A_CH1[1] < 0 or A_CH1[1] > max_number_samples * dt: # It cannot be outside this interval not possible
         return False
     
     # the bar's length is 169.8cm and the speed of light inside the material is about 16cm/ns

@@ -221,6 +221,7 @@ def fast_baseline(samples_np):
     return s / baseline_window
 
 def perform_fit(t, samples, baseline):
+
     # initial guess
     A0 = np.max(samples) - baseline # Adding this -baseline term, gets us the pure amplitude without offset.
     A1 = np.argmax(samples) * dt # to convert it into ns.
@@ -230,22 +231,28 @@ def perform_fit(t, samples, baseline):
     A5 = np.abs(A4) * A1
     A6 = baseline
 
+    # First guesses
     p0 = np.array([A0, A1, A2, A3, A4, A5, A6], dtype=float)
 
-    # Let's try to fit for a WINDOW = 30
-    lower = np.array([A0*0.1, A1-5, -0.5,  0, -0.5,  0, A6 - 0.7], dtype=float)
-    upper = np.array([A0*2  , A1+5,  0.5, 20,  0.5, 20, A6 + 0.7], dtype=float)
+    # According to plots of ToF paper:
+    # A2 can be something between 0 and 1 (I had from -0.5 to 0.5)
+    # A3 can be something from 0 to 10 (I had from 0 to 20)
+    # A4 can be something from -1 to 2 with a large peak on 0(I had from -0.5 to 0.5)
+    # A5 can be something from 0 to like 10 (I had from 0 to 20)
+
+    # Limits of the parameters. A0, A1 and A6 make sense but I'll change
+    # the resta according to paper and see what I get.
+    lower = np.array([A0*0.1, A1-5, 0,  0, -1,  0, A6 - 0.7], dtype=float)
+    upper = np.array([A0*2  , A1+5,  1, 10,  2, 10, A6 + 0.7], dtype=float)
 
 
     def residuals(params):
         return f(t, params) - samples
 
-    #changed curve fit for least squares method., it's supposed to be faster, but didn't give good results
-    res = least_squares(residuals,p0,bounds=(lower, upper),max_nfev=5000,method="trf")
+    # We perform fit with least_squares method insted of curve_fit method.
+    res = least_squares(residuals, p0, bounds=(lower, upper), max_nfev=5000, method="trf")
 
-    popt = res.x #This is the list of optimized parameters
-
-    return popt  # [A0..A6] This is for the least_squares part
+    return res.x #This is the list of optimized parameters [A0, A1, A2,...,A6]
 
 @njit
 def f(t, A):

@@ -37,10 +37,11 @@ def main(df, RATE, route_figure, channel_number):
     plt.figure(figsize=(8,5))
     plt.hist(FWHM,
              bins=bins,
-             alpha=0.7,
+             alpha=0.75,
              range=[min(FWHM),max(FWHM)],
              label=f'bins={bins};rate={int(round(RATE,0))}Hz',
-             density = False
+             density = False,
+             histtype='step'
              )
     plt.xlabel('FWHM (ns)')
     plt.ylabel('Counts')

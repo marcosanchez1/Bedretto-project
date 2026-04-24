@@ -27,7 +27,7 @@ from Plot2D_RatioAmplitudes_vs_TimeDifference import main as ratio_amplitude_vs_
 from Plot2D_FWHM_vs_time_difference import main as FWHM_vs_time_difference
 
 def main():
-    voltage = '57' # In 58 we just begin to distinguish the muon mountain
+    voltage = '57'
     run = '4'
     gate_length = '15' # in ns
     channel_source = '0'
@@ -36,7 +36,7 @@ def main():
     month = '4'
 
     #route of folder where to save the figures
-    route_figure = fr".\Plots\1Bar_2Chs\57V_Run4_triggerNormal_Trigger_0.02_Source_Ch0"
+    route_figure = fr".\Plots\1Bar_2Chs\Tests"
 
     # route of data
     route_fit_data = f".\\Data\\Processed_data\\1Bar_2Chs\\Run_{voltage}V_Run{run}_Data_{month}_{day}_2026_Ascii.csv"

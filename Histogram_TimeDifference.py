@@ -14,7 +14,6 @@ from Functions import discriminated_df
 def main(df, RATE, route_figure):
 
     TIME_DIFF = [row[0]['t_10'] - row[1]['t_10'] for row in df['channels']]
-    #TIME_DIFF = [row[0]['fit_parameters'][1] - row[1]['fit_parameters'][1] for row in df['channels']]
 
     bins = int(round(2 * np.sqrt(len(TIME_DIFF)),0))
 
@@ -24,7 +23,8 @@ def main(df, RATE, route_figure):
              alpha=0.7,
              range=[min(TIME_DIFF),max(TIME_DIFF)],
              label=f'bins={bins};rate={int(round(RATE,0))}Hz',
-             density = False
+             density = False,
+             histtype='step'
              )
     plt.xlabel('Time Difference (t0 - t1 in ns)')
     plt.ylabel('Counts')

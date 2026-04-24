@@ -43,7 +43,8 @@ def main(df, RATE, route_figure):
             bins=bins1,
             alpha=0.7,
             range=[bot_lim, sup_lim],
-            label=f'bins={bins1};rate={int(round(RATE,0))}Hz'
+            label=f'bins={bins1};rate={int(round(RATE,0))}Hz',
+            histtype='step'
             )
     ax1.set_title(f"Charge(Integral) Distribution - Ch0 (samples={len(charge_ch0)})")
     ax1.set_xlabel("Charge (ADC*ns)")
@@ -58,7 +59,8 @@ def main(df, RATE, route_figure):
             bins=bins2,
             range=[bot_lim, sup_lim], 
             alpha=0.7, 
-            label=f'bins={bins2};rate={int(round(RATE,0))}Hz'
+            label=f'bins={bins2};rate={int(round(RATE,0))}Hz',
+            histtype='step'
             )
     ax2.set_title(f"Charge(Integral) Distribution - Ch1 (samples={len(charge_ch1)})")
     ax2.set_xlabel("Charge (ADC*ns)")
@@ -74,7 +76,8 @@ def main(df, RATE, route_figure):
             bins=bins3,
             range=[bot_lim, sup_lim], 
             alpha=0.7, 
-            label=f'bins={bins3}'
+            label=f'bins={bins3}',
+            histtype='step'
             )
     ax3.set_title(f"Amplitude(A0) Distribution - Ch0 (samples={len(max_V0)})")
     ax3.legend()
@@ -89,7 +92,8 @@ def main(df, RATE, route_figure):
             bins=bins4,
             range=[bot_lim, sup_lim], 
             alpha=0.7, 
-            label=f'bins={bins4}'
+            label=f'bins={bins4}',
+            histtype='step'
             )
     ax4.set_title(f"Amplitude(A0) Distribution - Ch1 (samples={len(max_V1)})")
     ax4.legend()

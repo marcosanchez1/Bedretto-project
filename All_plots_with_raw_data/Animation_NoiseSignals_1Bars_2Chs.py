@@ -94,8 +94,6 @@ def main():
         t_ch1 = np.arange(len(noise1))*dt
         line_noise_1.set_data(t_ch1, noise1)
 
-        print(len(noise0),"   ",len(noise1))
-
         return line_raw_0, line_noise_0, line_raw_1, line_noise_1, title
 
     ani = animation.FuncAnimation(

@@ -103,8 +103,8 @@ def main(df, RATE, route_figure):
 
     plt.tight_layout()
     plt.savefig(f"{route_figure}\\Charge_and_Amplitude_Distributions.png")
-    plt.close()
     #plt.show()
+    plt.close()
     
     return 0
 

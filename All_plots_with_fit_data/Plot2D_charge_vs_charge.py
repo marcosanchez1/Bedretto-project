@@ -20,8 +20,8 @@ def main(df, RATE, route_figure):
     plt.figure(figsize=(8,5))
 
     n_bins = int(round(np.sqrt(len(data['charge_0'])),0))
-    charge0_limits = [min(data['charge_0']), max(data['charge_0'])]
-    charge1_limits = [min(data['charge_1']), max(data['charge_1'])]
+    charge0_limits = [min(data['charge_0']), 0.75]
+    charge1_limits = [min(data['charge_1']), 0.75]
     h = plt.hist2d(
                    data['charge_0'],
                    data['charge_1'],

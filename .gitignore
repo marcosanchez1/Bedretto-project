@@ -1,8 +1,5 @@
-*.pyc
-/.vscode
+*.png
 *.csv
 *.dat
 *.txt
-*.png
-*.pptx
-Process_Data_mk1.py
+*.gif

@@ -1,8 +1,5 @@
 '''
-In this script I'll try to plot TimeR vs TimeL in a 2D histogram maybe? or simply a plot?
-Federico said that we should only look at the difference in times, he said to look at the difference
-in times at 10% of amplitude but I'll take at the amplitude I think it's easier and the same.
-Also the plot I'm not quite sure but I think I'll do a 2D hi
+The structure of the data is as follows:
 
 channel,unix_time
 {0:{fit_parameters:[A0,A1,...],charge:charge_0,t_10: t_10,t_90:t_90},1:{0:{fitting_parameters:[A0,A1,...],charge:charge_0,t_10: t_10,t_90:t_90}},unix_time_0
@@ -22,9 +19,8 @@ from Functions import discriminated_df
 
 def main(df, RATE, route_figure, channel_number):
     
-    # time difference = t0 - t1
-    charge_key = f'charge_ch{channel_number}'
-    data = {'time_difference':[], charge_key:[]}
+    amplitude_key = f'A0_ch{channel_number}'
+    data = {'time_difference':[], amplitude_key:[]}
 
     for i in range(len(df['channels'])):
 
@@ -34,17 +30,11 @@ def main(df, RATE, route_figure, channel_number):
         t1 = df["channels"].iloc[i][1]['t_10'] # We take the t_10 of the second channel as reference time for the event.
         time_difference = t0 - t1
 
-        if charge_key == 'charge_ch0':
-            charge_chN = df["channels"].iloc[i][0]['charge'] # We take the charge of the first channel as reference charge for the event.
-        elif charge_key =='charge_ch1':
-            charge_chN = df["channels"].iloc[i][1]['charge'] # We take the charge of the second channel as reference charge for the event.
+        amplitude_chN = df["channels"].iloc[i][channel_number]['fit_parameters'][0] # We take the amplitude of the first channel.
 
-        if True:#time_difference >= -1 and time_difference <= 1:     
-            # We append the values of t
-            data['time_difference'].append(t0 - t1)
-            
-            # We append values of charge
-            data[charge_key].append(charge_chN)
+        data['time_difference'].append(time_difference)    
+        # We append values of amplitude
+        data[amplitude_key].append(amplitude_chN)
 
     # Now let's just plot tL vs tR
     plt.figure(figsize=(8,5))
@@ -52,22 +42,22 @@ def main(df, RATE, route_figure, channel_number):
     N = 1
     n_bins = int(round(N * np.sqrt(len(data['time_difference'])),0))
     time_limits = [min(data['time_difference']), max(data['time_difference'])]
-    charge_limits = [min(data[charge_key]), max(data[charge_key])]
+    amplitude_limits = [min(data[amplitude_key]), max(data[amplitude_key])]
     
     h = plt.hist2d(
                    data['time_difference'],
-                   data[charge_key],
+                   data[amplitude_key],
                    bins=n_bins,
                    cmap="turbo",
-                   range = [time_limits,charge_limits]
+                   range = [time_limits,amplitude_limits]
                    )
-    plt.ylabel(f'Charge-{channel_number} (ADC*ns)') #I shouldn't call it time of arrival it may generate confusion
+    plt.ylabel(f'A0_CH{channel_number} (ADC)') #I shouldn't call it time of arrival it may generate confusion
     plt.xlabel('Time Difference(t0 - t1; in ns)')
     plt.colorbar(h[3], label="Counts")
-    plt.title(f"Charge-{channel_number} vs Time Difference. bins={n_bins};rate={RATE}Hz;events={len(data['time_difference'])}")
+    plt.title(f"Amplitude(A0)-CH{channel_number} vs Time Difference. bins={n_bins};rate={RATE}Hz;events={len(data['time_difference'])}")
     plt.grid(True)
     plt.tight_layout()
-    plt.savefig(f"{route_figure}\\Charge-{channel_number}_vs_TimeDifference.png")
+    plt.savefig(f"{route_figure}\\Amplitude-{channel_number}_vs_TimeDifference.png")
     #plt.show()
     plt.close()
 

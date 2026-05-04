@@ -1,11 +1,14 @@
 '''
-In this script I'll just plot/animate the signals and compare it with the fitted signals of the new files I'm getting.
-The structure of the csv files is like:
+Data structure:
 
-     channel,unix_time
-     {0:{fit_parameters:[A0,A1,...],charge:charge_0,t_10: t_10,t_90:t_90},1:{0:{fitting_parameters:[A0,A1,...],charge:charge_0,t_10: t_10,t_90:t_90}},unix_time_0
+channel,unix_time
+{0:{fit_parameters:[A0,A1,...],charge:charge_0,t_10: t_10,t_90:t_90},1:{0:{fitting_parameters:[A0,A1,...],charge:charge_0,t_10: t_10,t_90:t_90}},unix_time_0
+
 
 The meaning of the parameters is in the paper but basically the're A0,A1,A2, etc...
+
+Just as a side note we know that the whole interval of time(t) has 1024 samples, but we only parametrized from 0 to peak+30
+samples, from our parameters A1 gives us the position of the peak, say it's 200, then we're gonna plot from 0 to 230.
 '''
 
 import matplotlib.pyplot as plt
@@ -53,7 +56,7 @@ def status(A,samples):
 def main():
     Voltage = '57'
     trigger_oscilloscope = 0.02
-    run = 4
+    run = 5
     day = 15 # For some reason for day 16 we have 272 samples in the raw files? It's not something I did I checked, the raw files simply are like that.
     month = 4
 
@@ -95,8 +98,8 @@ def main():
     axs[0].set_xlim(0, len(raw_ch0[0])*dt)
     axs[0].set_ylim(min( [min(raw_ch0[i]) for i in range(len(raw_ch0))] )-0.1, max( [max(raw_ch0[i]) for i in range(len(raw_ch0))] )+0.1)
     axs[0].set_xlabel('Time (ns)')
-    axs[0].set_ylabel('Signal (V)')
-    axs[0].axhline(y=mean_baseline_0, alpha=0.5, color="red", label=f'Baseline={round(mean_baseline_0,3)}')
+    axs[0].set_ylabel('Signal (ADC)')
+    #axs[0].axhline(y=mean_baseline_0, alpha=0.5, color="red", label=f'Baseline={round(mean_baseline_0,3)}')
     axs[0].axhline(y=trigger_oscilloscope, alpha=0.5, color="green", label=f'Trigger_level={round(trigger_oscilloscope,3)}')
     axs[0].legend()
     axs[0].grid(True)
@@ -104,10 +107,10 @@ def main():
     line_raw_1, = axs[1].plot([], [], label="Original_Data_Ch1")
     line_fit_1, = axs[1].plot([], [], color='orange', ls = '--', lw=2, label="Fit_Ch1")
     axs[1].set_xlabel('Time (ns)')
-    axs[1].set_ylabel('Signal (V)')
+    axs[1].set_ylabel('Signal (ADC)')
     axs[1].set_xlim(0, len(raw_ch1[0])*dt)
     axs[1].set_ylim(min( [min(raw_ch1[i]) for i in range(len(raw_ch1))] )-0.1, max( [max(raw_ch1[i]) for i in range(len(raw_ch1))] )+0.1)
-    axs[1].axhline(y=mean_baseline_1, alpha=0.5, color="red", label=f'Baseline={round(mean_baseline_1,3)}')
+    #axs[1].axhline(y=mean_baseline_1, alpha=0.5, color="red", label=f'Baseline={round(mean_baseline_1,3)}')
     axs[1].axhline(y=trigger_oscilloscope, alpha=0.5, color="green", label=f'Trigger_level={round(trigger_oscilloscope,3)}')
     axs[1].legend()
     axs[1].grid(True)
@@ -150,9 +153,9 @@ def main():
     for i in range(len(fit_ch0)):
         t0 = df_fit["channels"].iloc[i][0]['t_10']
         t1 = df_fit["channels"].iloc[i][1]['t_10']
-        time_difference = t0 - t1
-
-        if time_difference < -8:
+        if abs(t0-t1) > 20:
+            print('Event ', i)
+            print(df_fit["channels"].iloc[i])
             frames_to_animate.append(i)
     
     RATE = len(frames_to_animate) / (df_fit['unix_time'].iloc[frames_to_animate[-1]] - df_fit['unix_time'].iloc[frames_to_animate[0]])
@@ -161,7 +164,7 @@ def main():
     ani = animation.FuncAnimation(
         fig,
         update,
-        frames=[frames_to_animate[i] for i in range(0,len(frames_to_animate),10)], #From where to where do I plot and in how many steps
+        frames=[frames_to_animate[i] for i in range(0,len(frames_to_animate),1)], #From where to where do I plot and in how many steps
         interval=500, # How much time does the present frame last in ms
         blit=False
     )

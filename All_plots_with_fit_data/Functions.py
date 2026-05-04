@@ -74,13 +74,14 @@ def discriminated_df(df, trigger)->pd.DataFrame:
     # This is just an example, you can modify the conditions as you see fit.
     
     # Example condition: select events with charge above 0.5 ADC*ns in channel 0 and below 0.5 ADC*ns in channel 1.
-    threshold_ch0 = trigger * 1
-    threshold_ch1 = trigger * 0
+    #threshold_ch0 = trigger * 1
+    #threshold_ch1 = trigger * 0
 
-    new_df = df[(df['channels'].apply(lambda row: row[0]['fit_parameters'][0] >= threshold_ch0)) & 
-                         (df['channels'].apply(lambda row: row[1]['fit_parameters'][0] >= threshold_ch1))]
-    
-    new_df = new_df[new_df['channels'].apply(lambda row: row[0]['t_10'] - row[1]['t_10'] > 8)]
+    new_df = df[df['channels'].apply(lambda row: abs(row[0]['t_10'] - row[1]['t_10']) > 10)]
+
+    #cut_CH0 = 0.05
+    #new_df = df[(df['channels'].apply(lambda row: row[0]['fit_parameters'][0] < cut_CH0)) & 
+    #            (df['channels'].apply(lambda row: row[0]['fit_parameters'][0]) > 0)]
 
     return new_df
 
@@ -93,7 +94,7 @@ def status(row_fit_CH0, row_fit_CH1, samples_CH0, samples_CH1)->bool:
     dt = 0.3125
     max_number_samples = 1024
 
-    if A_CH0[1] < 0 or A_CH0[1] > max_number_samples*dt: # It cannot be outside this interval not possible
+    if A_CH0[1] < 0 or A_CH0[1] > max_number_samples * dt: # It cannot be outside this interval not possible
         return False
     
     # The position of the peak is not possible for it to be
@@ -102,10 +103,9 @@ def status(row_fit_CH0, row_fit_CH1, samples_CH0, samples_CH1)->bool:
     
     # the bar's length is 169.8cm and the speed of light inside the material is about 16cm/ns
     # meaning that if the signal is "good" it shouldn't be more than like 10.6125ns
-    if abs(row_fit_CH0['t_10'] - row_fit_CH1['t_10']) > 11:
-        return False
-
-    return True
+    time_difference = row_fit_CH0['t_10'] - row_fit_CH1['t_10']
+    if abs(time_difference) < 11:
+        return True
 
 # The idea of this function is to compare some elements such as amplitude of the fit
 # with the original data and in this way discriminate the events that may not have a

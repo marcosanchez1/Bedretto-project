@@ -13,7 +13,7 @@ from Functions import discriminated_df
 
 def main(df, RATE, route_figure):
 
-    TIME_DIFF = [row[0]['t_10'] - row[1]['t_10'] for row in df['channels']]
+    TIME_DIFF = [row[0]['t_90'] - row[1]['t_90'] for row in df['channels']]
 
     bins = int(round(2 * np.sqrt(len(TIME_DIFF)),0))
 

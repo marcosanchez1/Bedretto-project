@@ -96,8 +96,8 @@ def rid_of_muon_signal(df)->pd.DataFrame:
     for samples, unix_time in zip(df['channels'],df['unix_time']):
         row = {}
 
-        cut0 = get_t(samples[0],0.1)
-        cut1 = get_t(samples[1],0.1)
+        cut0 = 640 #get_t(samples[0],0.1) # 640 corresponds to 200ns (200ns/0.3125ns = 640 samples)
+        cut1 = 640 #get_t(samples[1],0.1) # I noticed that we just need to cut until this point to get rid of muon signal
         
         row[0] = samples[0][:cut0]
         row[1] = samples[1][:cut1]

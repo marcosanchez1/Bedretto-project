@@ -61,7 +61,6 @@ def main(df, rate, route_figure):
     plt.title("Average Noise FFT (after muon removal)")
     plt.grid(True, which="both", ls="--")
     plt.legend()
-
     plt.tight_layout()
     plt.savefig(f"{route_figure}\\FFT_Noise.png")
     plt.show()
@@ -70,16 +69,16 @@ def main(df, rate, route_figure):
 
 if __name__ == "__main__":
 
-    voltage = '57'
-    run = '5'
-    day = '15'
-    month = '4'
+    voltage = '0.005'
+    run = '7'
+    day = '5'
+    month = '5'
 
     #route of folder where to save the figures
-    route_figure = fr".\All_plots_with_raw_data\Plots\1Bar_2Chs\Tests"
+    route_figure = fr".\All_plots_with_raw_data\Plots\1Bar_2Chs\57Vcoincidence\Run_{voltage}V_Run{run}_Data_{month}_{day}_2026_Ascii"
 
     # route of original data, will only use it to compare with the fit and discriminate events
-    route_data = f".\\Data\\Raw_data\\1Bar_2Chs\\Run_{voltage}V_Run{run}_Data_{month}_{day}_2026_Ascii.dat"
+    route_data = fr".\Data\Raw_data\1Bar_2Chs\57Vcoincidence\Run_{voltage}V_Run{run}_Data_{month}_{day}_2026_Ascii.dat"
     df = get_raw_data(route_data)
 
     # compute rate

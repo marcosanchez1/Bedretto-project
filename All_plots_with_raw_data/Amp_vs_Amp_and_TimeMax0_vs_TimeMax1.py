@@ -47,7 +47,7 @@ def main(df, rate, route_figure):
             max0,
             max1,
             bins=bins0,
-            range=[[min(max0), 0.006], [min(max1), 0.006]],
+            range=[[min(max0), 0.1], [min(max1), 0.1]],
             cmap='turbo'
             )
     ax0.set_title(f"Max_CH0 vs Max_CH1(samples={len(max0)};bins={bins0};rate={int(round(RATE,0))}Hz)")
@@ -79,9 +79,9 @@ def main(df, rate, route_figure):
 
 if __name__ == "__main__":
 
-    voltage = '0.001'
-    run = '18'
-    day = '6'
+    voltage = '0.005'
+    run = '7'
+    day = '5'
     month = '5'
 
     #route of folder where to save the figures

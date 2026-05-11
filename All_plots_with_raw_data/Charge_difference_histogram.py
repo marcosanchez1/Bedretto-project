@@ -1,6 +1,4 @@
 '''
-In this script I'll do the 2D histogram of the max value of CH0 against the time at which the max value of CH0 happened, and the
-same goes for CH1.
 
 The data structure of the data frames should be something like this:
 channels,unix_time
@@ -17,62 +15,42 @@ from Functions import rid_of_muon_signal, get_raw_data
 dt = 0.3125
 def main(df, rate, route_figure):
 
-    max0 = []
-    max1 = []
+    diff_charges = []
     for row in df['channels']:
         ch0 = np.array(row[0])
         baseline_0 = np.mean(ch0[:100]) #To compute baseline we should only take like first 100 samples nothing too far.
         ch0_corr = ch0 - baseline_0
+        charge0 = np.sum(ch0_corr)*dt
 
         ch1 = np.array(row[1])
         baseline_1 = np.mean(ch1[:100])   # or median
         ch1_corr = ch1 - baseline_1
-        
-        Amp0 = np.max(ch0_corr)
-        Amp1 = np.max(ch1_corr)
+        charge1 = np.sum(ch1_corr)*dt
 
-        if ~(abs(Amp0 - Amp1) < 0.05):
-            max0.append(Amp0)
-            max1.append(Amp1)
+        diff_charges.append(charge0 - charge1)
 
-    rate = int(round(len(max0) / len(df) * rate, 0))
-
-    fig, ax = plt.subplots(1, 2, figsize=(10, 10))
-    ax0, ax1 = ax.flatten()
+    fig, ax = plt.subplots(1, 1, figsize=(10, 10))
+    ax0 = ax
     
     N = 2
-    bins0 = int(round(N * np.sqrt(len(max0)),0))
+    bins0 = int(round(N * np.sqrt(len(diff_charges)),0))
     h0 = ax0.hist(
-            max0,
+            diff_charges,
             bins=bins0,
             alpha=0.7,
             label=f'bins={bins0}',
-            range=[min(max0), max(max0)],
-            histtype='step'
+            range=[min(diff_charges), max(diff_charges)],
+            histtype='step',
+            density=False
             )
-    ax0.set_title(f"Max_CH0 (samples={len(max0)};rate={rate}Hz)")
+    ax0.set_title(f"Charge_CH0 - Charge_CH1 (samples={len(diff_charges)};rate={rate}Hz)")
     ax0.set_ylabel("Counts")
-    ax0.set_xlabel("Max_CH0 (ADC)")
+    ax0.set_xlabel("Difference in Charge (ADC*ns)")
     ax0.legend()
     ax0.grid(True)
 
-    bins1 = int(round(N * np.sqrt(len(max1)),0))
-    h1 = ax1.hist(
-            max1,
-            bins=bins1,
-            alpha=0.7,
-            label=f'bins={bins1}',
-            range=[min(max1), max(max1)],
-            histtype='step'
-            )
-    ax1.set_title(f"Max_CH1 (samples={len(max1)};rate={rate}Hz)")
-    ax1.set_ylabel("Counts")
-    ax1.set_xlabel("Max_CH1 (ADC)")
-    ax1.legend()
-    ax1.grid(True)
-
     plt.tight_layout()
-    plt.savefig(f"{route_figure}\\Amp_Histograms.png")
+    plt.savefig(f"{route_figure}\\Charge_Difference_Histogram.png")
     plt.show()
     plt.close()
 

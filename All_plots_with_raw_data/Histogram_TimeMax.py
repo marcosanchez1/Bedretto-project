@@ -19,8 +19,14 @@ def main(df, rate, route_figure):
     time0 = []
     time1 = []
     for row in df['channels']:
-        time0.append(np.argmax(row[0]) * dt)
-        time1.append(np.argmax(row[1]) * dt)
+        t0 = np.argmax(row[0]) * dt
+        t1 = np.argmax(row[1]) * dt
+        
+        Amp0 = np.max(row[0]) - np.mean(row[0][:100]) #To compute baseline we should only take like first 100 samples nothing too far.
+        Amp1 = np.max(row[1]) - np.mean(row[1][:100])   # or median
+
+        time0.append(t0)
+        time1.append(t1)
 
     fig, ax = plt.subplots(1, 2, figsize=(10, 10))
     ax0, ax1 = ax.flatten()
@@ -36,7 +42,7 @@ def main(df, rate, route_figure):
             histtype='step',
             density = False
             )
-    ax0.set_title(f"TimeMax_CH0 Distribution(samples={len(time0)})")
+    ax0.set_title(f"TimeMax_CH0 Distribution(samples={len(time0)};rate={rate}Hz)")
     ax0.set_ylabel("Counts")
     ax0.set_xlabel("TimeMax_CH0 (ns)")
     ax0.legend()
@@ -52,14 +58,14 @@ def main(df, rate, route_figure):
             histtype='step',
             density = False
             )
-    ax1.set_title(f"TimeMax_CH1 Distribution(samples={len(time1)})")
+    ax1.set_title(f"TimeMax_CH1 Distribution(samples={len(time1)};rate={rate}Hz)")
     ax1.set_ylabel("Counts")
     ax1.set_xlabel("TimeMax_CH1 (ns)")
     ax1.legend()
     ax1.grid(True)
 
     plt.tight_layout()
-    plt.savefig(f"{route_figure}\\TimeMax_Histograms.png")
+    #plt.savefig(f"{route_figure}\\TimeMax_Histograms.png")
     plt.show()
     plt.close()
 
@@ -67,9 +73,9 @@ def main(df, rate, route_figure):
 
 if __name__ == "__main__":
 
-    voltage = '0.001'
-    run = '18'
-    day = '6'
+    voltage = '0.020'
+    run = '10'
+    day = '5'
     month = '5'
 
     #route of folder where to save the figures

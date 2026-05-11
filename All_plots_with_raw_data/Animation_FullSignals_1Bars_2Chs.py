@@ -22,9 +22,9 @@ from Functions import get_raw_data, rid_of_muon_signal
 dt = 0.3125 # multiply sample_i by this to get it in ns
 max_number_samples = 1024
 def main():
-    Voltage = '0.001'
-    trigger_oscilloscope = 0.001
-    run = 18
+    Voltage = '0.003'
+    trigger_oscilloscope = 0.003
+    run = 17
     day = '6' # For some reason for day 16 we have 272 samples in the raw files? It's not something I did I checked, the raw files simply are like that.
     month = '5'
 
@@ -88,15 +88,26 @@ def main():
         line_raw_1.set_data(t_ch1, samples1)
 
         return line_raw_0, line_raw_1, title
+    
+    frame_animate = []
+    for i in range(len(raw_ch0)):
+        Amp0 = np.max(raw_ch0[i]) - np.mean(raw_ch0[i][:100])
+        t0 = np.argmax(raw_ch0[i]) * dt
+
+        Amp1 = np.max(raw_ch1[i]) - np.mean(raw_ch1[i][:100])
+        t1 = np.argmax(raw_ch1[i]) * dt
+
+        if t0 > 250 or t1 > 250:
+            frame_animate.append(i)
 
     ani = animation.FuncAnimation(
         fig,
         update,
-        frames= 20, #From where to where do I plot and in how many steps
+        frames= frame_animate, #From where to where do I plot and in how many steps
         interval = 500, # How much time does the present frame last in ms
         blit=False
     )
-    ani.save(r".\All_plots_with_raw_data\FullSignalAnimation.gif", writer="pillow", fps=5)
+    #ani.save(r".\All_plots_with_raw_data\FullSignalAnimation.gif", writer="pillow", fps=5)
     plt.show()
 
 

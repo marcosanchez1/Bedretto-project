@@ -1,6 +1,8 @@
 '''
-In this script I'll do the 2D histogram of the max value of CH0 against the time at which the max value of CH0 happened, and the
-same goes for CH1.
+In this script I'll do the 2D histogram of the max value of CH0 against the max value of CH1, and by request of prof. I'll
+also do the 2D histogram of the time at which the max value of CH0 is reached against the time at which the max value of CH1
+is reached.
+And it's important to noe that for this script I'll take the whole signal, including the muon peaks according to what prof said.
 
 The data structure of the data frames should be something like this:
 channels,unix_time
@@ -16,43 +18,44 @@ from Functions import rid_of_muon_signal, get_raw_data
 
 dt = 0.3125
 def main(df, rate, route_figure):
+
     charge0 = []
     charge1 = []
     for row in df['channels']:
-        # We integrate only until the peak.
-        aux_ch0 = np.sum(row[0][:np.argmax(row[0])]) * dt
-        aux_ch1 = np.sum(row[1][:np.argmax(row[1])]) * dt
+        ch0 = np.array(row[0])
+        baseline = np.mean(ch0[:100]) #To compute baseline we should only take like first 100 samples nothing too far.
+        ch0_corr = ch0 - baseline
 
-        #if(aux_ch0 > 0.2 and aux_ch1 > 0.2): # We only take events that have a positive charge in both channels, to avoid taking noise events.
-        charge0.append(aux_ch0)
-        charge1.append(aux_ch1)
-    
-    # This is to compute the new rate considering we discriminated events.
-    rate = (len(charge0)/len(df['channels'])) * rate
-    rate = int(round(rate, 0))
+        ch1 = np.array(row[1])
+        baseline = np.mean(ch1[:100])   # or median
+        ch1_corr = ch1 - baseline
 
-    fig, ax = plt.subplots(1, 1, figsize=(10, 10))
-    ax0 = ax
-    
-    N = 3
+        aux_charge0 = np.sum(ch0_corr) * dt
+        aux_charge1 = np.sum(ch1_corr) * dt
+        
+        charge0.append(aux_charge0)
+        charge1.append(aux_charge1)
+
+    rate = int(round(len(charge0) / len(df) * rate, 0))
+
+    fig, ax = plt.subplots(1, 1, figsize=(10, 10))    
+    N = 2
     bins0 = int(round(N * np.sqrt(len(charge0)),0))
-    h0 = ax0.hist2d(
+    h0 = ax.hist2d(
             charge0,
             charge1,
             bins=bins0,
-            range=[[min(charge0), max(charge0)], [min(charge1), max(charge1)]],
-            cmap='turbo',
-            density = False
+            range=[[min(charge0), 2], [min(charge1), 2]],
+            cmap='turbo'
             )
-    ax0.set_title(f"Charge_CH0 vs Charge_CH1 (samples={len(charge0)};rate={rate}Hz)")
-    ax0.set_ylabel("Charge_CH1 (ADC*ns)")
-    ax0.set_xlabel("Charge_CH0 (ADC*ns)")
+    ax.set_title(f"Charge_CH0 vs Charge_CH1(samples={len(charge0)};bins={bins0};rate={rate}Hz)")
+    ax.set_xlabel("Charge_CH0 (ADC*ns)")
+    ax.set_ylabel("Charge_CH1 (ADC*ns)")
     plt.colorbar(h0[3], label="Counts")
-    ax0.grid(True)
-    ax0.set_aspect('equal', adjustable='box')
+    ax.grid(True)
 
     plt.tight_layout()
-    plt.savefig(f"{route_figure}\\Charge_vs_Charge.png")
+    plt.savefig(f"{route_figure}\\Charge_vs_Charge_2DHistograms.png")
     plt.show()
     plt.close()
 

@@ -68,6 +68,8 @@ def main(df, rate, route_figure):
 
 if __name__ == "__main__":
 
+    print("\nStarting execution.\n")
+
     voltage = '0.005'
     run = '7'
     day = '5'

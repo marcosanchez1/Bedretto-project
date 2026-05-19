@@ -29,21 +29,26 @@ def main(route_figure):
             df = get_raw_data(input_path)
 
             rate = len(df) / (df['unix_time'].iloc[-1] - df['unix_time'].iloc[0])
-            RATES.append(rate)
-
             trigger = float(file.split("_")[1].replace("V",""))
+            
+            RATES.append(rate)
             TRIGGERS.append(trigger)
+
+
     
+    '''
     plt.figure(figsize=(10, 6))
-    plt.plot(TRIGGERS, RATES, marker='o')
+    plt.plot(TRIGGERS, RATES, color='blue', alpha=0.7, marker='o', label='Data points')
     plt.title("Rate vs Trigger Voltage")
     plt.xlabel("Trigger Threshold (ADC)")
     plt.ylabel("Rate (Hz)")
     plt.grid(True)
+    plt.legend()
     plt.show()
     plt.savefig(os.path.join(route_figure, "Rate_vs_Trigger.png"))
+    '''
 
-    return 0
+    return RATES, TRIGGERS
 
 if __name__ == "__main__":
     print("\nStarting execution.\n")

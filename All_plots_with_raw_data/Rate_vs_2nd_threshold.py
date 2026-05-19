@@ -1,6 +1,6 @@
 '''
 In this script I'll do one plot: the rate of events vs sofwtare trheshold that I'll apply to this data set but
-taking the data that are below the threshold.
+taking the data that are above the threshold.
 
 The data structure of the data frames should be something like this:
 channels,unix_time
@@ -18,11 +18,11 @@ from Functions import get_raw_data
 dt = 0.3125
 def main(df, route_figure):
 
-    thresholds = np.linspace(0.055, 1, 100) # Thresholds to test
+    thresholds = np.linspace(0.065, 1, 100) # Thresholds to test
     rates = []
 
     for th in thresholds:
-        # Count events below the threshold
+        # Count events above the threshold
         count = 0
         for row in df['channels']:
             ch0 = np.array(row[0])
@@ -34,7 +34,7 @@ def main(df, route_figure):
 
     plt.figure(figsize=(10, 6))
     plt.plot(thresholds, rates, marker='o')
-    plt.title("Rate vs Threshold(0.055 <= threshold < max(ch0 and ch1))")
+    plt.title("Rate vs Threshold(0.065 <= threshold < max(ch0 and ch1))")
     plt.xlabel("Threshold (ADC)")
     plt.ylabel("Rate (Hz)")
     plt.grid(True)
@@ -46,9 +46,9 @@ if __name__ == "__main__":
 
     print("\nStarting execution.\n")
 
-    voltage = '0.003'
-    run = '17'
-    day = '6'
+    voltage = '0.065'
+    run = '22'
+    day = '11'
     month = '5'
 
     #route of folder where to save the figures

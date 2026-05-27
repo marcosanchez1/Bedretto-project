@@ -17,7 +17,7 @@ from Functions import get_raw_data, rid_of_muon_signal
 
 dt = 0.3125
 def main(route_figure):
-    route_files = r".\Data\Raw_data\1Bar_2Chs\57Vcoincidence"
+    route_files = r".\Data\Raw_data\1Bar_2Chs\57Vcoincidence_GateLength_15ns"
     list_files = os.listdir(route_files)
     
     RATES = []

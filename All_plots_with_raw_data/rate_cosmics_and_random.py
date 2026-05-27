@@ -16,8 +16,8 @@ import matplotlib.pyplot as plt
 from Rate_vs_trigger import main as manual_runs
 from scipy.optimize import curve_fit
 
-def rate_model(V, a, b, c, d, e, f):
-    return a*V**5 + b*V**4 + c*V**3 + d*V**2 + e*V + f
+def rate_model(V, a, b, c, d, e, f, g, h, k):
+    return a*V**5 + b*V**4 + c*V**3 + d*V**2 + e*V + f + g*np.exp(-h*V)
 
 def perform_fit(thresholds, rates):
     # Remove zeros or negative values (log-fit stability)
@@ -82,14 +82,13 @@ def read_rate_vs_threshold(filename):
 
     return np.array(thresholds), np.array(rates_ch0), np.array(rates_ch1)
 
-
 def main():
-    filename = fr".\Data\Raw_data\1Bar_2Chs\57Vcoincidence\rate_vs_threshold\Test_time5s_steps500_0.001_to_0.06.dat"
+    filename = fr".\Data\Raw_data\1Bar_2Chs\57Vcoincidence_GateLength_15ns\rate_vs_threshold\Test_time5s_steps500_0.001_to_0.06.dat"
 
     # obtain data
     thresholds, rates_ch0, rates_ch1 = read_rate_vs_threshold(filename)
     idx = np.where( thresholds == 0.005)
-    i, step = int(idx[0][0]), 5
+    i, step = int(idx[0][0]), 1
     thresholds_fit, rates_ch0_fit, rates_ch1_fit = thresholds[i::step], rates_ch0[i::step], rates_ch1[i::step]
     
     rate_coin, triggers = manual_runs(None)
@@ -100,38 +99,36 @@ def main():
     P_CH1 = perform_fit(np.array(thresholds_fit), np.array(rates_ch1_fit))
     P_COIN = perform_fit(np.array(triggers_fit), np.array(rate_coin_fit))
 
-    CH0 = lambda x: P_CH0[0]* np.power(x,5) + P_CH0[1]*np.power(x,4) + P_CH0[2]*np.power(x,3) + P_CH0[3]*np.power(x,2) + P_CH0[4]*np.power(x,1) + P_CH0[5]
-    CH1 = lambda x: P_CH1[0]*np.power(x,5) + P_CH1[1]*np.power(x,4) + P_CH1[2]*np.power(x,3) + P_CH1[3]*np.power(x,2) + P_CH1[4]*np.power(x,1) + P_CH1[5]
-    COIN = lambda x: P_COIN[0]*np.power(x,5) + P_COIN[1]*np.power(x,4) + P_COIN[2]*np.power(x,3) + P_COIN[3]*np.power(x,2) + P_COIN[4]*np.power(x,1) + P_COIN[5]
+    CH0 = lambda x: rate_model(x, *P_CH0)
+    CH1 = lambda x: rate_model(x, *P_CH1)
+    COIN = lambda x: rate_model(x, *P_COIN)
 
-    window = 20e-9 #This in oscilloscope is 15ns but I'll try with what Federico told me.
-    R2_plus = lambda x: ((1 - window*(CH0(x) - CH1(x))) + np.sqrt( np.power(1-window*(CH0(x) - CH1(x)),2) - 4*window*(CH1(x) - COIN(x)) ))/2*window
-    R2_minus = lambda x: ((1 - window*(CH0(x) - CH1(x))) - np.sqrt( np.power(1-window*(CH0(x) - CH1(x)),2) - 4*window*(CH1(x) - COIN(x)) ))/2*window
+    window = 15e-9 #This in oscilloscope is 15ns but I'll try with what Federico told me.
+    epsilon = 0.2
+    # The second root was the only one that made sense
+    CS = lambda x: np.roots([window*(1-2*epsilon), 1-epsilon-(1-epsilon)*window*(CH0(x) + CH1(x)), window*CH0(x)*CH1(x) - COIN(x)])[1]
+    R0 = lambda x: CH0(x) - CS(x)
+    R1 = lambda x: CH1(x) - CS(x)
 
-    R1_plus = lambda x: ((1 - window*(CH1(x) - CH0(x))) + np.sqrt( np.power(1-window*(CH1(x) - CH0(x)),2) - 4*window*(CH0(x) - COIN(x)) ))/2*window
-    R1_minus = lambda x: ((1 - window*(CH1(x) - CH0(x))) - np.sqrt( np.power(1-window*(CH1(x) - CH0(x)),2) - 4*window*(CH0(x) - COIN(x)) ))/2*window
-    
-    cosmics_plus = lambda x: COIN(x) - R1_plus(x)*R2_plus(x)*window
-    cosmics_minus = lambda x: COIN(x) - R1_minus(x)*R2_minus(x)*window
-    
     # Plot
     plt.figure(figsize=(10,6))
-    #plt.plot(thresholds_fit, CH0(thresholds_fit), label='CH0 Rate', linestyle='-', alpha=0.7)
-    #plt.plot(thresholds_fit, CH1(thresholds_fit), label='CH1 Rate', linestyle='-', alpha=0.7)
-    plt.plot(thresholds_fit, COIN(thresholds_fit), label='Coincidence rate', linestyle='-', alpha=0.7)
+    domain = thresholds_fit
 
-    #plt.plot(thresholds_fit, R2_plus(thresholds_fit), label='R2(+)', linestyle='--', alpha=0.7)
-    #plt.plot(thresholds_fit, R2_minus(thresholds_fit), label='R2(-)', linestyle='--', alpha=0.7)
-    
-    #plt.plot(thresholds_fit, R1_plus(thresholds_fit), label='R1(+)', linestyle='--', alpha=0.7)
-    #plt.plot(thresholds_fit, R1_minus(thresholds_fit), label='R1(-)', linestyle='--', alpha=0.7)
-    
-    plt.plot(thresholds_fit, cosmics_plus(thresholds_fit), label='cosmics(++)', linestyle='--', alpha=0.7)
-    plt.plot(thresholds_fit, cosmics_minus(thresholds_fit), label='cosmics(--)', linestyle='--', alpha=0.7)
-    
+    plt.plot(thresholds_fit, rates_ch0_fit, label='CH0 rate data', marker='o', linestyle='-', alpha=0.7)
+    plt.plot(thresholds_fit, rates_ch1_fit, label='CH1 rate data', marker='s', linestyle='-', alpha=0.7)
+    plt.plot(triggers_fit, rate_coin_fit, label='Coincidence rate data', marker='x', linestyle='-', alpha=0.7)
+
+    plt.plot(domain, [CH0(x) for x in domain], label='CH0 Rate fit', linestyle='-', alpha=0.7)
+    plt.plot(domain, [CH1(x) for x in domain], label='CH1 Rate fit', linestyle='-', alpha=0.7)
+    plt.plot(domain, [COIN(x) for x in domain], label='COIN Rate fit', linestyle='-', alpha=0.7)
+
+    plt.plot(domain, [CS(x) for x in domain], label='CS', linestyle='--', alpha=0.7)
+    plt.plot(domain, [R0(x) for x in domain], label='R0', linestyle='--', alpha=0.7)
+    plt.plot(domain, [R1(x) for x in domain], label='R1', linestyle='--', alpha=0.7)
+
     plt.xlabel("Threshold [V]")
     plt.ylabel("Rate [Hz]")
-    plt.title("Rate vs Threshold")
+    plt.title(f"Rate vs Threshold(\u03B5={epsilon})")
     plt.grid(True, which="both", ls="--", alpha=0.6)
     plt.legend()
     plt.tight_layout()

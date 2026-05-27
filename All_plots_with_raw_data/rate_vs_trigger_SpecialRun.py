@@ -121,14 +121,18 @@ def main():
     Noise_CH1 = lambda x: PN1[0]*x**5 + PN1[1]*x**4 + PN1[2]*x**3 + PN1[3]*x**2 + PN1[4]*x + PN1[5]
 
     # Plot
+    GL = 15e-9 #gate length
     plt.figure(figsize=(10,6))
     plt.plot(thresholds, rates_ch0, label='CH0 Rate', marker='o', linestyle='-', alpha=0.7)
     plt.plot(thresholds, rates_ch1, label='CH1 Rate', marker='s', linestyle='-', alpha=0.7)
-    plt.plot(triggers, rate_coin, label='Coincidence rate', marker='x', linestyle='-', alpha=0.7)
-
+    plt.plot(triggers, rate_coin, label='Measured Coincidence', marker='x', linestyle='-', alpha=0.7)
+    plt.plot(thresholds, [rates_ch1[i]*rates_ch0[i]*GL for i in range(len(thresholds))], label='Theoretical Coincidence', marker='x', linestyle='-', alpha=0.7)
+    
     plt.plot(th_0, rates_ch0_fit, label='CH0 Fit', linestyle='--')
     plt.plot(th_1, rates_ch1_fit, label='CH1 Fit', linestyle='--')
-    plt.plot(triggers_fit, rate_coin_fit, label='Coincidence Fit', linestyle='--')
+    plt.plot(triggers_fit, rate_coin_fit, label='Measured coincidence Fit', linestyle='--')
+    plt.plot(th_1, [rates_ch0_fit[i]*rates_ch1_fit[i]*GL for i in range(len(th_1))], label='Theoretical coincidence Fit', linestyle='--')
+
 
     plt.plot(th_0,Noise_CH0(th_0), label='CH0 Noise', linestyle='--')
     plt.plot(th_1,Noise_CH1(th_1), label='CH1 Noise', linestyle='--')

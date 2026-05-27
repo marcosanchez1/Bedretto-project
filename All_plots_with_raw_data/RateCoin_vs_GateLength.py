@@ -18,8 +18,8 @@ from Functions import get_raw_data
 def main():
 
     # And declare the threshold we're working with, it's in the name of the file
-    th = '0.010'
-    run = 2
+    th = input('Threshold: ')
+    run = input('Run: ')
 
     # we declare the time resolution of the oscilloscope in nano seconds
     dt = 0.3125

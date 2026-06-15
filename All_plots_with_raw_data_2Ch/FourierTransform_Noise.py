@@ -57,12 +57,12 @@ def main(df, rate, route_figure):
     plt.loglog(freqs, psd1, label="CH1 PSD")
 
     plt.xlabel("Frequency (MHz)")
-    plt.ylabel("Power Spectral Density(ADC^2/Hz)")
+    plt.ylabel("Power Spectral Density(V^2/Hz)")
     plt.title("Average Noise FFT (after muon removal)")
     plt.grid(True, which="both", ls="--")
     plt.legend()
     plt.tight_layout()
-    plt.savefig(f"{route_figure}\\FFT_Noise.png")
+    #plt.savefig(f"{route_figure}\\FFT_Noise.png")
     plt.show()
     plt.close()
 
@@ -75,10 +75,10 @@ if __name__ == "__main__":
     month = '5'
 
     #route of folder where to save the figures
-    route_figure = fr".\All_plots_with_raw_data\Plots\1Bar_2Chs\57Vcoincidence\Run_{voltage}V_Run{run}_Data_{month}_{day}_2026_Ascii"
+    route_figure = fr".\All_plots_with_raw_data\Plots\1Bar_2Chs\57Vcoincidence_GateLEngth_15ns\Run_{voltage}V_Run{run}_Data_{month}_{day}_2026_Ascii"
 
     # route of original data, will only use it to compare with the fit and discriminate events
-    route_data = fr".\Data\Raw_data\1Bar_2Chs\57Vcoincidence\Run_{voltage}V_Run{run}_Data_{month}_{day}_2026_Ascii.dat"
+    route_data = fr".\Data\Raw_data\1Bar_2Chs\57Vcoincidence_GateLEngth_15ns\Run_{voltage}V_Run{run}_Data_{month}_{day}_2026_Ascii.dat"
     df = get_raw_data(route_data)
 
     # compute rate

@@ -3,3 +3,6 @@
 *.dat
 *.txt
 *.gif
+*.lz4
+*.root
+*.zip

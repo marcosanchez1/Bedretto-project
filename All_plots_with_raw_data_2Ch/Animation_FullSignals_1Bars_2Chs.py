@@ -22,15 +22,15 @@ from Functions import get_raw_data, rid_of_muon_signal
 dt = 0.3125 # multiply sample_i by this to get it in ns
 max_number_samples = 1024
 def main():
-    Voltage = '0.003'
-    trigger_oscilloscope = 0.003
-    run = 17
-    day = '6' # For some reason for day 16 we have 272 samples in the raw files? It's not something I did I checked, the raw files simply are like that.
+    Voltage = '0.010'
+    trigger_oscilloscope = 0.010
+    run = 8
+    day = '5' # For some reason for day 16 we have 272 samples in the raw files? It's not something I did I checked, the raw files simply are like that.
     month = '5'
 
     # Load raw data
     #df_raw = get_raw_data(f".\\Data\\Raw_data\\1Bar_2Chs\\57V_varying_gatelength_and_trigger_only\\Run_{Voltage}V_Run{run}_Data_{month}_{day}_2026_Ascii.dat")
-    df = get_raw_data(fr".\Data\Raw_data\1Bar_2Chs\57Vcoincidence\Run_{Voltage}V_Run{run}_Data_{month}_{day}_2026_Ascii.dat")
+    df = get_raw_data(fr".\Data\Raw_data\2Bar_4Ch\COIN_CH0123\Run_{Voltage}V_Run{run}_Data_{month}_{day}_2026_Ascii.dat")
 
     #df = df[df["channels"].apply(lambda row: np.argmax(row[0])*dt > 200 and np.argmax(row[0])*dt < 250)
     #                & df["channels"].apply(lambda row: np.argmax(row[1])*dt > 200 and np.argmax(row[1])*dt < 250)]
@@ -51,9 +51,9 @@ def main():
 
     line_raw_0, = axs[0].plot([], [], label="Original_Data_Ch-0")
     axs[0].set_xlim(-0.1, max_number_samples*dt)
-    axs[0].set_ylim(np.min(raw_ch0[0]) - 0.005, np.max(raw_ch0[0])*2)
+    axs[0].set_ylim(np.min(raw_ch0[0]) - 0.005, np.max(raw_ch0[0])*7)
     axs[0].set_xlabel('Time (ns)')
-    axs[0].set_ylabel('Signal (ADC)')
+    axs[0].set_ylabel('Signal (V)')
     axs[0].axhline(y=baseline0, alpha=0.5, color="red", label=f'Baseline={round(baseline0,3)}')
     axs[0].axhline(y=trigger_oscilloscope, alpha=0.5, color="green", label=f'Trigger_level={round(trigger_oscilloscope,3)}')
     axs[0].legend()
@@ -61,9 +61,9 @@ def main():
 
     line_raw_1, = axs[1].plot([], [], label="Original_Data_Ch1")
     axs[1].set_xlabel('Time (ns)')
-    axs[1].set_ylabel('Signal (ADC)')
+    axs[1].set_ylabel('Signal (V)')
     axs[1].set_xlim(-0.1, max_number_samples*dt)
-    axs[1].set_ylim(np.min(raw_ch1[0]) - 0.005, np.max(raw_ch1[0])*2)
+    axs[1].set_ylim(np.min(raw_ch1[0]) - 0.005, np.max(raw_ch1[0])*7)
     axs[1].axhline(y=baseline1, alpha=0.5, color="red", label=f'Baseline={round(baseline1,3)}')
     axs[1].axhline(y=trigger_oscilloscope, alpha=0.5, color="green", label=f'Trigger_level={round(trigger_oscilloscope,3)}')
     axs[1].legend()
@@ -88,22 +88,11 @@ def main():
         line_raw_1.set_data(t_ch1, samples1)
 
         return line_raw_0, line_raw_1, title
-    
-    frame_animate = []
-    for i in range(len(raw_ch0)):
-        Amp0 = np.max(raw_ch0[i]) - np.mean(raw_ch0[i][:100])
-        t0 = np.argmax(raw_ch0[i]) * dt
-
-        Amp1 = np.max(raw_ch1[i]) - np.mean(raw_ch1[i][:100])
-        t1 = np.argmax(raw_ch1[i]) * dt
-
-        if t0 > 250 or t1 > 250:
-            frame_animate.append(i)
 
     ani = animation.FuncAnimation(
         fig,
         update,
-        frames= frame_animate, #From where to where do I plot and in how many steps
+        frames= 100, #From where to where do I plot and in how many steps
         interval = 500, # How much time does the present frame last in ms
         blit=False
     )

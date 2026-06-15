@@ -16,42 +16,56 @@ from Functions import rid_of_muon_signal, get_raw_data
 dt = 0.3125
 
 def main(df, rate, route_figure):
-    time_diff = []
+    time0 = []
+    time1 = []
     for row in df['channels']:
         Amplitude0 = np.max(row[0])
         Amplitude1 = np.max(row[1])
 
         idx = np.where(row[0] >= Amplitude0*0.1 )[0]
-        time0 = idx[0]*dt
+        time0.append(idx[0]*dt)
         
         idx = np.where(row[1] >= Amplitude1*0.1 )[0]
-        time1 = idx[0]*dt
+        time1.append(idx[0]*dt)
 
-        time_diff.append(time1 - time0)
-
-    fig, ax = plt.subplots(1, 1, figsize=(10, 10))
+    fig, ax = plt.subplots(1, 2, figsize=(10, 10))
+    ax0, ax1 = ax.flatten()
     
-    N = 7
-    bins0 = int(round(N * np.sqrt(len(time_diff)),0))
-    h0 = ax.hist(
-            time_diff,
+    N = 5
+    bins0 = int(round(N * np.sqrt(len(time0)),0))
+    h0 = ax0.hist(
+            time0,
             bins=bins0,
             alpha = 0.7,
             label = f'bins={bins0}',
-            range=[min(time_diff), max(time_diff)],
+            range=[min(time0), max(time0)],
             histtype='step',
             density = False
             )
-    ax.set_title(f"TimeDifference(t1-t0) Distribution(samples={len(time_diff)};rate={rate}Hz)")
-    ax.set_ylabel("Counts")
-    ax.set_xlabel("TimeDifference (ns)")
-    ax.axvline(x=10.6125, color='red', label='theoretical max time difference')
-    ax.axvline(x=-10.6125, color='red')
-    ax.legend()
-    ax.grid(True)
+    ax0.set_title(f"TimeArrival_CH0 Distribution(samples={len(time0)};rate={rate}Hz)")
+    ax0.set_ylabel("Counts")
+    ax0.set_xlabel("TimeArrival_CH0 (ns)")
+    ax0.legend()
+    ax0.grid(True)
+
+    bins1 = int(round(N * np.sqrt(len(time1)),0))
+    h1 = ax1.hist(
+            time1,
+            bins=bins1,
+            alpha = 0.7,
+            label = f'bins={bins1}',
+            range=[min(time1), max(time1)],
+            histtype='step',
+            density = False
+            )
+    ax1.set_title(f"TimeArrival_CH1 Distribution(samples={len(time1)};rate={rate}Hz)")
+    ax1.set_ylabel("Counts")
+    ax1.set_xlabel("TimeArrival_CH1 (ns)")
+    ax1.legend()
+    ax1.grid(True)
 
     plt.tight_layout()
-    #plt.savefig(f"{route_figure}\\TimeDifference_Histograms.png")
+    #plt.savefig(f"{route_figure}\\TimeArrival_Histograms.png")
     plt.show()
     plt.close()
 

@@ -111,23 +111,6 @@ def get_raw_rootFile(input_path):
 # find the time at 10% of the peak, then we'll return only from 0 to this value, maybe even take like 
 # 30 samples less or something like that.
 def rid_of_muon_signal(df)->pd.DataFrame:
-    
-    # This function is just to get the sample number at which we have
-    # the fraction of the amplitude
-    def get_t(samples, fraction):
-
-        baseline = np.mean(samples[:50])
-        peak = np.max(samples)
-        peak_position = np.argmax(samples)
-        target = (peak - baseline) * fraction + baseline
-        
-        interval = 100
-        idx = np.where(samples[peak_position - interval:peak_position] >= target)[0]#we'll take advantage of the very steep rise of the signal.
-        
-        if len(idx) == 0:
-            return len(samples) # no crossing found return full length
-        
-        return idx[0] + (peak_position - interval)
 
     new_df = {'channels':[], 'unix_time':[]}
     for samples, unix_time in zip(df['channels'],df['unix_time']):
@@ -151,3 +134,20 @@ def rid_of_muon_signal(df)->pd.DataFrame:
         new_df["unix_time"].append(unix_time)
 
     return pd.DataFrame(new_df)
+
+# This function is just to get the sample number at which we have
+# the fraction of the amplitude
+def get_t(samples, fraction):
+
+    baseline = np.mean(samples[:50])
+    peak = np.max(samples)
+    peak_position = np.argmax(samples)
+    target = (peak - baseline) * fraction + baseline
+    
+    interval = 200
+    idx = np.where(samples[peak_position - interval:peak_position] >= target)[0]#we'll take advantage of the very steep rise of the signal.
+    
+    if len(idx) == 0:
+        return len(samples) # no crossing found return full length
+    
+    return idx[0] + (peak_position - interval)

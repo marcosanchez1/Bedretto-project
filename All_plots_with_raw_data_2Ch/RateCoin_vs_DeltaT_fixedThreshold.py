@@ -13,8 +13,9 @@ channels,unix_time
 
 import numpy as np
 import matplotlib.pyplot as plt
-from Functions import get_raw_data
+from Functions import get_raw_datFile, get_t
 from scipy.optimize import curve_fit
+import os
 
 def curve(x,m,b):
     return m*x + b
@@ -24,65 +25,70 @@ def perform_fit(X,Y):
     return P
 
 def main():
-    th = input('Threshold: ')
-    run = input('Run: ')
-
     dt = 0.3125  # ns
-    filename = fr".\Data\Raw_data\1Bar_2Chs\57V_TriggerCh0_VaryTrigger\Run_{th}V_Run{run}_Data_3_22_2026_Ascii.dat"
+    route_files = r".\Data\Raw_data\1Bar_2Ch\57V_TriggerCh0_VaryTrigger"
+    list_files = os.listdir(route_files)
+    
+    fig, ax = plt.subplots(figsize=(10, 10))
 
-    th = float(th)
-
-    df = get_raw_data(filename)
-
-    # Pre-extract arrays for speed
-    channels = df["channels"].to_numpy()
-    ch0_peaks = np.array([np.max(row[0]) for row in channels])
-    ch1_peaks = np.array([np.max(row[1]) for row in channels])
-    ch0_argmax = np.array([np.argmax(row[0]) for row in channels])
-    ch1_argmax = np.array([np.argmax(row[1]) for row in channels])
-
-    TOTAL_TIME = df["unix_time"].iloc[-1] - df["unix_time"].iloc[0]
-
-    fig, ax = plt.subplots(1, 1, figsize=(15, 10))
-
-    th_f = th + 0.001
     DELTA_T = np.linspace(0, 60, 200)
 
-    while th < th_f:
+    for file in list_files:
+        if not file.endswith(".dat"):
+            continue
 
-        # Precompute coincidence mask for this threshold
-        valid_events = (ch0_peaks >= th) & (ch1_peaks >= th)
-        dt_peaks = (ch0_argmax - ch1_argmax) * dt
-        dt_valid = dt_peaks[valid_events]
+        input_path = os.path.join(route_files, file)
+        df = get_raw_datFile(input_path)
 
-        # Vectorized coincidence counting
-        COINCIDENCE = np.array([
-            np.sum(np.abs(dt_valid) <= delta_t) / TOTAL_TIME
-            for delta_t in DELTA_T
-        ])
+        # Extract threshold value from filename
+        th = float(file.split("_")[1].replace("V", ""))
+        
+        if th <= 0.006:
+            TOTAL_TIME = df["unix_time"].iloc[-1] - df["unix_time"].iloc[0]
+        
+        # Pre-extract arrays for speed
+        channels = df["channels"].to_numpy()
+        ch0_peaks = np.array([np.max(row[0]) for row in channels])
+        ch1_peaks = np.array([np.max(row[1]) for row in channels])
+        time_detection_ch0= np.array([get_t(row[0], 0.2) for row in channels])
+        time_detection_ch1= np.array([get_t(row[1], 0.2) for row in channels])
+
+        COINCIDENCE = []
+        for delta_t in DELTA_T:
+            count = 0
+            ti = df['unix_time'].iloc[0]
+            for i in range(len(df)):
+                peak0 = ch0_peaks[i]
+                peak1 = ch1_peaks[i]
+
+                t0 = time_detection_ch0[i]
+                t1 = time_detection_ch1[i]
+
+                if peak0 >= th and peak1 >= th:
+                    if abs(t0 - t1) <= delta_t:
+                        count += 1
+                
+                tf = df['unix_time'].iloc[i]
+                if tf - ti >= TOTAL_TIME:
+                    break
+            COINCIDENCE.append(count / TOTAL_TIME)  # Rate in Hz
 
         # Plot
         ax.plot(DELTA_T, COINCIDENCE, label=f'Th={round(th,4)}', marker='o', linestyle='-', alpha=0.7)
-        
-        k = np.where(DELTA_T >= 20 )[0][0]
-        X,Y = DELTA_T[:k], COINCIDENCE[:k]
-        P1 = perform_fit(X, Y)
-        ax.plot(X, [curve(x, *P1) for x in X], label=f'm={round(P1[0],4)};b={round(P1[1],4)}', marker='', linestyle='-', alpha=0.7)
+            
+        #k = np.where(DELTA_T >= 20 )[0][0]
+        #X,Y = DELTA_T[k:], COINCIDENCE[k:]
+        #P = perform_fit(X, Y)
+        #ax.plot(X, [curve(x, *P) for x in X], label=f'm={round(P[0],4)};b={round(P[1],4)}', marker='', linestyle='-', alpha=0.7)
 
-        X,Y = DELTA_T[k:], COINCIDENCE[k:]
-        P2 = perform_fit(X, Y)
-        ax.plot(X, [curve(x, *P2) for x in X], label=f'm={round(P2[0],4)};b={round(P2[1],4)}', marker='', linestyle='-', alpha=0.7)
-
-        th += 0.001
-
-    ax.set_title(f'Coincidences vs Δt')
+    ax.set_title(f'Coincidences vs Δt(time_sampling={TOTAL_TIME}s)')
     ax.set_xlabel('Δt (ns)')
     ax.set_ylabel('Rate (Hz)')
     ax.legend()
     ax.grid(True)
 
     plt.tight_layout()
-    plt.savefig(fr'.\All_plots_with_raw_data\Plots\1Bar_2Chs\57V_TriggerCh0_VaryTrigger\Run{run}_Th{round(th-0.005,4)}.png')
+    #plt.savefig(fr'.\All_plots_with_raw_data\Plots\1Bar_2Chs\57V_TriggerCh0_VaryTrigger\Run{run}_Th{round(th-0.005,4)}.png')
     plt.show()
 
     return 0

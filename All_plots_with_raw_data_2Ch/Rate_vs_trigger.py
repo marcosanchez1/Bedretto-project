@@ -18,11 +18,10 @@ from Functions import get_raw_data, rid_of_muon_signal
 dt = 0.3125
 def main(route_figure):
     route_files = r".\Data\Raw_data\1Bar_2Chs\57Vcoincidence_GateLength_15ns"
-    list_files = os.listdir(route_files)
-    
     RATES = []
     TRIGGERS = []
 
+    list_files = os.listdir(route_files)
     for file in list_files:
         if file.endswith(".dat"):
             input_path = os.path.join(route_files, file)
@@ -34,19 +33,15 @@ def main(route_figure):
             RATES.append(rate)
             TRIGGERS.append(trigger)
 
-
-    
-    '''
     plt.figure(figsize=(10, 6))
     plt.plot(TRIGGERS, RATES, color='blue', alpha=0.7, marker='o', label='Data points')
     plt.title("Rate vs Trigger Voltage")
-    plt.xlabel("Trigger Threshold (ADC)")
+    plt.xlabel("Trigger Threshold (V)")
     plt.ylabel("Rate (Hz)")
     plt.grid(True)
     plt.legend()
     plt.show()
-    plt.savefig(os.path.join(route_figure, "Rate_vs_Trigger.png"))
-    '''
+    #plt.savefig(os.path.join(route_figure, "Rate_vs_Trigger.png"))
 
     return RATES, TRIGGERS
 

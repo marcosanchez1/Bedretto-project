@@ -88,8 +88,8 @@ def main():
         # Plot
         ax.plot(DELTA_T, COINCIDENCE, label=f'Th={round(th,4)}', marker='o', linestyle='-', alpha=0.7)
             
-        k = np.where(DELTA_T >= 40 )[0][0]
-        X1,Y1 = DELTA_T[k:], COINCIDENCE[k:]
+        k1 = np.where(DELTA_T >= 30 )[0][0]
+        X1,Y1 = DELTA_T[:k1], COINCIDENCE[:k1]
         P1 = perform_fit(X1, Y1)
         # Compute fitted values
         Y_fit1 = np.array([curve(x, *P1) for x in X1])
@@ -102,8 +102,8 @@ def main():
         #ax.plot(X1, [curve(x, *P1) for x in X1], label=f'm={round(P[0],4)};b={round(P[1],4)};χ²={chi2_red:.2f}', marker='', linestyle='-', alpha=0.7)
         ax.plot(X1, [curve(x, *P1) for x in X1], label=f'', marker='', linestyle='-', alpha=0.7)
 
-        k = np.where(DELTA_T >= 30 )[0][0]
-        X2,Y2 = DELTA_T[:k], COINCIDENCE[:k]
+        k2 = np.where(DELTA_T >= 40 )[0][0]
+        X2,Y2 = DELTA_T[k2:], COINCIDENCE[k2:]
         P2 = perform_fit(X2, Y2)
         # Compute fitted values
         Y_fit2 = np.array([curve(x, *P2) for x in X2])

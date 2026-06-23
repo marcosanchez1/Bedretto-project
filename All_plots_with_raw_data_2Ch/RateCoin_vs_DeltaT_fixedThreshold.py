@@ -28,6 +28,11 @@ def chi2(y_data, y_fit, y_err=None):
         # assume equal weights
         y_err = np.ones_like(y_data)
     return np.sum(((y_data - y_fit) / y_err)**2)
+def r2(y_data, y_fit):
+    ss_res = np.sum((y_data - y_fit)**2)
+    ss_tot = np.sum((y_data - np.mean(y_data))**2)
+    return 1 - ss_res/ss_tot
+
 
 def main():
     dt = 0.3125  # ns
@@ -87,11 +92,13 @@ def main():
         X1,Y1 = DELTA_T[k:], COINCIDENCE[k:]
         P1 = perform_fit(X1, Y1)
         # Compute fitted values
-        Y_fit = np.array([curve(x, *P1) for x in X1])
+        Y_fit1 = np.array([curve(x, *P1) for x in X1])
         # Compute chi-square
-        chi2_val = chi2(Y1, Y_fit)
+        chi2_val = chi2(Y1, Y_fit1)
         ndof = len(X1) - len(P1)   # number of degrees of freedom
         chi2_red_1 = chi2_val / ndof
+        # R²
+        r2_1 = r2(Y1, Y_fit1)
         #ax.plot(X1, [curve(x, *P1) for x in X1], label=f'm={round(P[0],4)};b={round(P[1],4)};χ²={chi2_red:.2f}', marker='', linestyle='-', alpha=0.7)
         ax.plot(X1, [curve(x, *P1) for x in X1], label=f'', marker='', linestyle='-', alpha=0.7)
 
@@ -99,15 +106,17 @@ def main():
         X2,Y2 = DELTA_T[:k], COINCIDENCE[:k]
         P2 = perform_fit(X2, Y2)
         # Compute fitted values
-        Y_fit = np.array([curve(x, *P2) for x in X2])
+        Y_fit2 = np.array([curve(x, *P2) for x in X2])
         # Compute chi-square
-        chi2_val = chi2(Y2, Y_fit)
+        chi2_val = chi2(Y2, Y_fit2)
         ndof = len(X2) - len(P2)   # number of degrees of freedom
         chi2_red_2 = chi2_val / ndof
+        # R²
+        r2_2 = r2(Y2, Y_fit2)
         #ax.plot(X2, [curve(x, *P) for x in X2], label=f'm={round(P2[0],4)};b={round(P2[1],4)};χ²={chi2_red:.2f}', marker='', linestyle='-', alpha=0.7)
         ax.plot(X2, [curve(x, *P2) for x in X2], label=f'', marker='', linestyle='-', alpha=0.7)
 
-        print(f'Threshold: {th}\n1st fit: m={round(P1[0],4)};b={round(P1[1],4)};χ²={chi2_red_1:.2f} | 2nd fit: m={round(P2[0],4)};b={round(P2[1],4)};χ²={chi2_red_2:.2f}')
+        print(f'Threshold: {th}\n1st fit: m={round(P1[0],4)};b={round(P1[1],4)};χ²={chi2_red_1:.2f};R²={r2_1:.2f} | 2nd fit: m={round(P2[0],4)};b={round(P2[1],4)};χ²={chi2_red_2:.2f};R²={r2_2:.2f}')
 
     ax.set_title(f'Coincidences vs Δt(time_sampling={round(TOTAL_TIME,3)}s)')
     ax.set_xlabel('Δt (ns)')

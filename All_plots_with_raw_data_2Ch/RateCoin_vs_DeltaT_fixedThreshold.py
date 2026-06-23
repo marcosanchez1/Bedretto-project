@@ -23,6 +23,11 @@ def curve(x,m,b):
 def perform_fit(X,Y):
     P, cov = curve_fit(curve, X, Y)
     return P
+def chi2(y_data, y_fit, y_err=None):
+    if y_err is None:
+        # assume equal weights
+        y_err = np.ones_like(y_data)
+    return np.sum(((y_data - y_fit) / y_err)**2)
 
 def main():
     dt = 0.3125  # ns
@@ -63,11 +68,13 @@ def main():
 
                 t0 = time_detection_ch0[i]
                 t1 = time_detection_ch1[i]
-
+                
+                # Coincidence conditions
                 if peak0 >= th and peak1 >= th:
                     if abs(t0 - t1) <= delta_t:
                         count += 1
-                
+
+                # This conditions helps us stop when we have the same time on all data sets 
                 tf = df['unix_time'].iloc[i]
                 if tf - ti >= TOTAL_TIME:
                     break
@@ -76,12 +83,33 @@ def main():
         # Plot
         ax.plot(DELTA_T, COINCIDENCE, label=f'Th={round(th,4)}', marker='o', linestyle='-', alpha=0.7)
             
-        #k = np.where(DELTA_T >= 20 )[0][0]
-        #X,Y = DELTA_T[k:], COINCIDENCE[k:]
-        #P = perform_fit(X, Y)
-        #ax.plot(X, [curve(x, *P) for x in X], label=f'm={round(P[0],4)};b={round(P[1],4)}', marker='', linestyle='-', alpha=0.7)
+        k = np.where(DELTA_T >= 40 )[0][0]
+        X1,Y1 = DELTA_T[k:], COINCIDENCE[k:]
+        P1 = perform_fit(X1, Y1)
+        # Compute fitted values
+        Y_fit = np.array([curve(x, *P1) for x in X1])
+        # Compute chi-square
+        chi2_val = chi2(Y1, Y_fit)
+        ndof = len(X1) - len(P1)   # number of degrees of freedom
+        chi2_red_1 = chi2_val / ndof
+        #ax.plot(X1, [curve(x, *P1) for x in X1], label=f'm={round(P[0],4)};b={round(P[1],4)};χ²={chi2_red:.2f}', marker='', linestyle='-', alpha=0.7)
+        ax.plot(X1, [curve(x, *P1) for x in X1], label=f'', marker='', linestyle='-', alpha=0.7)
 
-    ax.set_title(f'Coincidences vs Δt(time_sampling={TOTAL_TIME}s)')
+        k = np.where(DELTA_T >= 30 )[0][0]
+        X2,Y2 = DELTA_T[:k], COINCIDENCE[:k]
+        P2 = perform_fit(X2, Y2)
+        # Compute fitted values
+        Y_fit = np.array([curve(x, *P2) for x in X2])
+        # Compute chi-square
+        chi2_val = chi2(Y2, Y_fit)
+        ndof = len(X2) - len(P2)   # number of degrees of freedom
+        chi2_red_2 = chi2_val / ndof
+        #ax.plot(X2, [curve(x, *P) for x in X2], label=f'm={round(P2[0],4)};b={round(P2[1],4)};χ²={chi2_red:.2f}', marker='', linestyle='-', alpha=0.7)
+        ax.plot(X2, [curve(x, *P2) for x in X2], label=f'', marker='', linestyle='-', alpha=0.7)
+
+        print(f'Threshold: {th}\n1st fit: m={round(P1[0],4)};b={round(P1[1],4)};χ²={chi2_red_1:.2f} | 2nd fit: m={round(P2[0],4)};b={round(P2[1],4)};χ²={chi2_red_2:.2f}')
+
+    ax.set_title(f'Coincidences vs Δt(time_sampling={round(TOTAL_TIME,3)}s)')
     ax.set_xlabel('Δt (ns)')
     ax.set_ylabel('Rate (Hz)')
     ax.legend()

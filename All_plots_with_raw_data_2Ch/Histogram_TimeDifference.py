@@ -23,8 +23,8 @@ def main(df, rate, route_figure):
     time_diff = []
     for row in df['channels']:
         
-        time0 = get_t(row[0], 0.1)
-        time1 = get_t(row[1], 0.1)
+        time0 = get_t(row[0], 0.2)
+        time1 = get_t(row[1], 0.2)
 
         time_diff.append(time1 - time0)
 
@@ -66,8 +66,8 @@ def main(df, rate, route_figure):
 
 if __name__ == "__main__":
 
-    voltage = '0.020'
-    run = '10'
+    voltage = '0.030'
+    run = '12'
     day = '5'
     month = '5'
 

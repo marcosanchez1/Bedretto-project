@@ -18,8 +18,7 @@ d = 5
 L = 170
 
 def main(df, route_figure, trigger):
-    DELTA_X_PLUS = []
-    DELTA_X_MINUS = []
+    DELTA_X = []
     
     DELTA_T = []
     DELTA_T_aux = []
@@ -60,16 +59,15 @@ def main(df, route_figure, trigger):
 
                 DELTA_T.append(delta_t)
                 DELTA_T_aux.append(delta_t + t3 - t1)
-                DELTA_X_PLUS.append(delta_x)
-                DELTA_X_MINUS.append(-delta_x)
+
+                DELTA_X.append( delta_x*(t0-t1+t3-t2 > 0) - delta_x*(t0-t1+t3-t2 < 0) )
 
     fig, axs = plt.subplots(2, 2, figsize=(12, 10))
     N = 2
-    N_bins = int( round( N*np.sqrt(len(DELTA_X_PLUS)) ,0) )
+    N_bins = int( round( N*np.sqrt(len(DELTA_X)) ,0) )
 
-    axs[0, 0].hist(DELTA_X_PLUS, bins=N_bins, histtype='step', color='green', alpha=0.7, label=f'(+),bins={N_bins}')
-    axs[0, 0].hist(DELTA_X_MINUS, bins=N_bins, histtype='step', color='blue', alpha=0.7, label=f'(-),bins={N_bins}')
-    axs[0, 0].set_title(f'x - x\' Distribution (samples={len(DELTA_X_PLUS)})')
+    axs[0, 0].hist(DELTA_X, bins=N_bins, histtype='step', color='green', alpha=0.7, label=f'bins={N_bins}')
+    axs[0, 0].set_title(f'x - x\' Distribution (samples={len(DELTA_X)})')
     axs[0, 0].set_xlabel('Position (cm)')
     axs[0, 0].set_ylabel('Frequency')
     axs[0, 0].legend()
@@ -82,17 +80,17 @@ def main(df, route_figure, trigger):
     axs[0, 1].legend()
     axs[0, 1].grid(True)
 
-    im = axs[1, 0].hist2d(DELTA_T_aux, DELTA_X_PLUS, bins=N_bins, cmap='turbo')
-    axs[1, 0].set_title(f't\' - t + t3 - t1 vs (x - x\')_plus (samples={len(DELTA_X_PLUS)})')
+    im = axs[1, 0].hist2d(DELTA_T_aux, DELTA_X, bins=N_bins, cmap='turbo')
+    axs[1, 0].set_title(f'(t\' - t) + t3 - t1 vs (x - x\') (samples={len(DELTA_X)})')
     axs[1, 0].set_xlabel('Time (ns)')
     axs[1, 0].set_ylabel('Position (cm)')
     fig.colorbar(im[3], ax=axs[1, 0], label='Counts')
 
-    im = axs[1, 1].hist2d(DELTA_T_aux, DELTA_X_MINUS, bins=N_bins, cmap='turbo')
-    axs[1, 1].set_title(f't\' - t + t3 - t1 vs (x - x\')_minus (samples={len(DELTA_X_MINUS)})')
-    axs[1, 1].set_xlabel('Time (ns)')
-    axs[1, 1].set_ylabel('Position (cm)')
-    fig.colorbar(im[3], ax=axs[1, 1], label='Counts')
+    #im = axs[1, 1].hist2d(DELTA_T_aux, DELTA_X, bins=N_bins, cmap='turbo')
+    #axs[1, 1].set_title(f't\' - t + t3 - t1 vs (x - x\')_minus (samples={len(DELTA_X)})')
+    #axs[1, 1].set_xlabel('Time (ns)')
+    #axs[1, 1].set_ylabel('Position (cm)')
+    #fig.colorbar(im[3], ax=axs[1, 1], label='Counts')
 
     plt.tight_layout()
     plt.savefig(f"{route_figure}/SpeedPositionTime_Distributions.png")

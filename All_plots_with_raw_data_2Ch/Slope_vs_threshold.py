@@ -30,6 +30,7 @@ def main():
 
     time_k = [10 + 1*i for i in range(11)]
     M = []
+    CS = []
     TH = []
 
     for file in list_files:
@@ -70,20 +71,38 @@ def main():
             COINCIDENCE.append(count / TOTAL_TIME)  # Rate in Hz
 
         # Fit: I noticed that from 40ns onward we have what we want, maybe even from 35ns.
+        k = np.where(DELTA_T >= 30 )[0][0]
+        X,Y = DELTA_T[:k], COINCIDENCE[:k]
+        P1 = perform_fit(X, Y)
+        
         k = np.where(DELTA_T >= 40 )[0][0]
         X,Y = DELTA_T[k:], COINCIDENCE[k:]
-        P = perform_fit(X, Y)
-
-        M.append(P[0])
+        P2 = perform_fit(X, Y)
+        
+        M.append(P2[0]) # Noise
         TH.append(th)
+        CS.append( (P1[0] - P2[0])/(2*P2[0]**0.5)) #From solving system of equations
 
     fig, ax = plt.subplots(1, 1, figsize=(15, 10))
-    ax.plot(TH, M, label=f'Δt>{40}ns', marker='o', linestyle='-', alpha=0.7)
-    ax.set_title(f'Slope vs threshold')
+
+    # First axis (left)
+    ax.plot(TH, M, label=f'Noise', marker='o', linestyle='-', alpha=0.7)
     ax.set_xlabel('Threshold (V)')
-    ax.set_ylabel('Slope (Hz^2)')
-    ax.legend()
+    ax.set_ylabel('Noise rate (Hz^2)')   # example label
+
+    # Second axis (right)
+    ax2 = ax.twinx()
+    ax2.plot(TH, CS, label=f'Cosmics', marker='o', linestyle='-', alpha=0.7, color='orange')
+    ax2.set_ylabel('Cosmic rate (Hz)')  # example label
+
+    # Title, grid, legends
+    ax.set_title('Noise and Cosmics vs Threshold')
     ax.grid(True)
+
+    # Two legends (combine handles)
+    h1, l1 = ax.get_legend_handles_labels()
+    h2, l2 = ax2.get_legend_handles_labels()
+    ax.legend(h1 + h2, l1 + l2, loc='upper right')
 
     plt.tight_layout()
     plt.show()

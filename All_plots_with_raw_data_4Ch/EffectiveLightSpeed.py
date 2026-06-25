@@ -19,9 +19,10 @@ L = 170
 
 def main(df, route_figure, trigger):
     DELTA_X = []
-    
     DELTA_T = []
     DELTA_T_aux = []
+    SPEED = []
+    time_window = 20
 
     for index, row in df.iterrows():
         ch0 = row['channels'][0]
@@ -40,7 +41,6 @@ def main(df, route_figure, trigger):
         t2 = get_t(ch2, 0.2)
         t3 = get_t(ch3, 0.2)
 
-        time_window = 20
         # Check if all peaks are above the trigger threshold and if the time differences are within time window
         if peak0 >= trigger and peak1 >= trigger and peak2 >= trigger and peak3 >= trigger:
             #if abs(t0 - t1) < time_window and abs(t2 - t3) < time_window:  # Check if the time differences are within time window
@@ -53,17 +53,20 @@ def main(df, route_figure, trigger):
                             continue
 
                 # Instead of sqrt we use binomial expansion to avoid complex number
-                #delta_x = np.sqrt((c*delta_t)**2 - d**2)
-                x = -(d/(c*delta_t))**2
-                delta_x = c*delta_t*(1 + 0.5*x - 0.125*x**2) # binomial expansion up to second order
+                delta_x = np.sqrt((c*delta_t)**2 - d**2)
+                #x = -(d/(c*delta_t))**2
+                #delta_x = c*delta_t*(1 + 0.5*x - 0.125*x**2) # binomial expansion up to second order
+                delta_x = delta_x*(t0-t1+t3-t2 > 0) - delta_x*(t0-t1+t3-t2 < 0)
+                delta_t_aux = delta_t + t3 - t1
 
                 DELTA_T.append(delta_t)
-                DELTA_T_aux.append(delta_t + t3 - t1)
-
-                DELTA_X.append( delta_x*(t0-t1+t3-t2 > 0) - delta_x*(t0-t1+t3-t2 < 0) )
+                DELTA_T_aux.append(delta_t_aux)
+                DELTA_X.append( delta_x )
+                if delta_t_aux != 0:
+                      SPEED.append(delta_x/delta_t_aux)
 
     fig, axs = plt.subplots(2, 2, figsize=(12, 10))
-    N = 2
+    N = 3
     N_bins = int( round( N*np.sqrt(len(DELTA_X)) ,0) )
 
     axs[0, 0].hist(DELTA_X, bins=N_bins, histtype='step', color='green', alpha=0.7, label=f'bins={N_bins}')
@@ -86,11 +89,13 @@ def main(df, route_figure, trigger):
     axs[1, 0].set_ylabel('Position (cm)')
     fig.colorbar(im[3], ax=axs[1, 0], label='Counts')
 
-    #im = axs[1, 1].hist2d(DELTA_T_aux, DELTA_X, bins=N_bins, cmap='turbo')
-    #axs[1, 1].set_title(f't\' - t + t3 - t1 vs (x - x\')_minus (samples={len(DELTA_X)})')
-    #axs[1, 1].set_xlabel('Time (ns)')
-    #axs[1, 1].set_ylabel('Position (cm)')
-    #fig.colorbar(im[3], ax=axs[1, 1], label='Counts')
+    N_bins = int( round( N*np.sqrt(len(SPEED)) ,0) )
+    axs[1, 1].hist(SPEED, bins=N_bins, histtype='step', color='blue', alpha=0.7, label=f'bins={N_bins}')
+    axs[1, 1].set_title(f'v Distribution (samples={len(SPEED)})')
+    axs[1, 1].set_xlabel('Speed (cm/ns)')
+    axs[1, 1].set_ylabel('Frequency')
+    axs[1, 1].legend()
+    axs[1, 1].grid(True)
 
     plt.tight_layout()
     plt.savefig(f"{route_figure}/SpeedPositionTime_Distributions.png")
@@ -104,14 +109,14 @@ if __name__ == "__main__":
 
     voltage = '0.015'
     run = '3'
-    day = '17'
+    day = '9'
     month = '6'
 
     #route of folder where to save the figures
     route_figure = fr".\All_plots_with_raw_data_4Ch\Plots"
 
     # route of original data, will only use it to compare with the fit and discriminate events
-    route_data = fr".\Data\Raw_data\2Bar_4Ch\NormalMode\TriggerCh0\Run_{voltage}V_Run{run}_Data_{month}_{day}_2026_Ascii.dat"
+    route_data = fr".\Data\Raw_data\2Bar_4Ch\CoincidenceMode\COIN_CH0123_PS57V_GL15ns\Run_{voltage}V_Run{run}_Data_{month}_{day}_2026_Ascii.dat"
     df = get_raw_datFile(route_data)
 
     main(df, route_figure, float(voltage))

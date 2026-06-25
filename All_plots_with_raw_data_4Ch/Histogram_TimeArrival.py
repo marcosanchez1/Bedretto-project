@@ -1,5 +1,5 @@
 '''
-I define time of arrival at 10% of the amplitude, and I want to see the distribution of these.
+In this script I'll do a 1D histogram of the time of arrival of signals.
 
 The data structure of the data frames should be something like this:
 channels,unix_time
@@ -11,61 +11,87 @@ channels,unix_time
 '''
 import numpy as np
 import matplotlib.pyplot as plt
-from Functions import rid_of_muon_signal, get_raw_data
+from Functions import get_raw_datFile, get_t
 
 dt = 0.3125
-
 def main(df, rate, route_figure):
-    time0 = []
-    time1 = []
+
+    t0 = []
+    t1 = []
+    t2 = []
+    t3 = []
     for row in df['channels']:
-        Amplitude0 = np.max(row[0])
-        Amplitude1 = np.max(row[1])
+        t0.append(get_t(row[0],0.2))
+        t1.append(get_t(row[1],0.2))
+        t2.append(get_t(row[2],0.2))
+        t3.append(get_t(row[3],0.2))
 
-        idx = np.where(row[0] >= Amplitude0*0.1 )[0]
-        time0.append(idx[0]*dt)
-        
-        idx = np.where(row[1] >= Amplitude1*0.1 )[0]
-        time1.append(idx[0]*dt)
-
-    fig, ax = plt.subplots(1, 2, figsize=(10, 10))
-    ax0, ax1 = ax.flatten()
+    fig, ax = plt.subplots(2, 2, figsize=(10, 10))
+    ax0, ax1, ax2, ax3 = ax.flatten()
     
-    N = 5
-    bins0 = int(round(N * np.sqrt(len(time0)),0))
+    N = 3
+    bins0 = int(round(N * np.sqrt(len(t0)),0))
     h0 = ax0.hist(
-            time0,
+            t0,
             bins=bins0,
-            alpha = 0.7,
-            label = f'bins={bins0}',
-            range=[min(time0), max(time0)],
-            histtype='step',
-            density = False
+            alpha=0.7,
+            label=f'bins={bins0}',
+            range=[min(t0), max(t0)],
+            histtype='step'
             )
-    ax0.set_title(f"TimeArrival_CH0 Distribution(samples={len(time0)};rate={rate}Hz)")
+    ax0.set_title(f"Time of arrival distribution CH0 (samples={len(t0)};rate={rate}Hz)")
     ax0.set_ylabel("Counts")
-    ax0.set_xlabel("TimeArrival_CH0 (ns)")
+    ax0.set_xlabel("t0 (ns)")
     ax0.legend()
     ax0.grid(True)
 
-    bins1 = int(round(N * np.sqrt(len(time1)),0))
+    bins1 = int(round(N * np.sqrt(len(t1)),0))
     h1 = ax1.hist(
-            time1,
+            t1,
             bins=bins1,
-            alpha = 0.7,
-            label = f'bins={bins1}',
-            range=[min(time1), max(time1)],
-            histtype='step',
-            density = False
+            alpha=0.7,
+            label=f'bins={bins1}',
+            range=[min(t1), max(t1)],
+            histtype='step'
             )
-    ax1.set_title(f"TimeArrival_CH1 Distribution(samples={len(time1)};rate={rate}Hz)")
+    ax1.set_title(f"Time of arrival distribution CH1 (samples={len(t1)};rate={rate}Hz)")
     ax1.set_ylabel("Counts")
-    ax1.set_xlabel("TimeArrival_CH1 (ns)")
+    ax1.set_xlabel("t1 (ns)")
     ax1.legend()
     ax1.grid(True)
+    
+    bins2 = int(round(N * np.sqrt(len(t2)),0))
+    h2 = ax2.hist(
+            t2,
+            bins=bins2,
+            alpha=0.7,
+            label=f'bins={bins2}',
+            range=[min(t2), max(t2)],
+            histtype='step'
+            )
+    ax2.set_title(f"Time of arrival distribution CH2 (samples={len(t2)};rate={rate}Hz)")
+    ax2.set_ylabel("Counts")
+    ax2.set_xlabel("t2 (ns)")
+    ax2.legend()
+    ax2.grid(True)
+
+    bins3 = int(round(N * np.sqrt(len(t3)),0))
+    h3 = ax3.hist(
+            t3,
+            bins=bins3,
+            alpha=0.7,
+            label=f'bins={bins3}',
+            range=[min(t3), max(t3)],
+            histtype='step'
+            )
+    ax3.set_title(f"Time of arrival distribution CH3 (samples={len(t3)};rate={rate}Hz)")
+    ax3.set_ylabel("Counts")
+    ax3.set_xlabel("t3 (ns)")
+    ax3.legend()
+    ax3.grid(True)
 
     plt.tight_layout()
-    #plt.savefig(f"{route_figure}\\TimeArrival_Histograms.png")
+    plt.savefig(f"{route_figure}\\TimeOfArrival_Histograms.png")
     plt.show()
     plt.close()
 
@@ -73,18 +99,18 @@ def main(df, rate, route_figure):
 
 if __name__ == "__main__":
 
-    voltage = '0.020'
-    run = '10'
-    day = '5'
-    month = '5'
+    voltage = '0.005'
+    run = '1'
+    day = '25'
+    month = '6'
 
     #route of folder where to save the figures
-    route_figure = fr".\All_plots_with_raw_data\Plots\1Bar_2Chs\57Vcoincidence\Run_{voltage}V_Run{run}_Data_{month}_{day}_2026_Ascii"
+    route_figure = fr".\All_plots_with_raw_data_4Ch\Plots"
 
     # route of original data, will only use it to compare with the fit and discriminate events
-    route_data = fr".\Data\Raw_data\1Bar_2Chs\57Vcoincidence\Run_{voltage}V_Run{run}_Data_{month}_{day}_2026_Ascii.dat"
-    df = get_raw_data(route_data)
-
+    route_data = fr".\Data\Raw_data\2Bar_4Ch\CoincidenceMode\COIN_CH0123_PS57V_GL15ns\Run_{voltage}V_Run{run}_Data_{month}_{day}_2026_Ascii.dat"
+    df = get_raw_datFile(route_data)
+        
     # compute rate
     RATE = len(df['unix_time'])/(df['unix_time'].iloc[-1] - df['unix_time'].iloc[0])
     RATE = int(round(RATE, 0))

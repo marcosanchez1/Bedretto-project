@@ -17,7 +17,7 @@ import numpy as np
 import pandas as pd
 
 # My proper scripts
-from Functions import get_raw_datFile, get_raw_rootFile
+from Functions import get_raw_datFile, get_raw_rootFile, get_t
 
 dt = 0.3125 # multiply sample_i by this to get it in ns
 max_number_samples = 1024
@@ -25,9 +25,8 @@ def main():
     trigger_oscilloscope = 0.015
 
     # Load raw data
-    #df_raw = get_raw_data(f".\\Data\\Raw_data\\1Bar_2Chs\\57V_varying_gatelength_and_trigger_only\\Run_{Voltage}V_Run{run}_Data_{month}_{day}_2026_Ascii.dat")
-    #df = get_raw_datFile(fr".\Data\Raw_data\2Bar_4Ch\coincidence\COIN_CH23_PS57V_GL15ns\Run_0.015V_Run1_Data_6_9_2026_Ascii.dat")
-    df = get_raw_rootFile(fr".\Data\Raw_data\MIDAS\NormalMode\run02550.root")
+    df = get_raw_datFile(fr".\Data\Raw_data\2Bar_4Ch\CoincidenceMode\COIN_CH0123_PS57V_GL15ns\Run_0.015V_Run3_Data_6_9_2026_Ascii.dat")
+    #df = get_raw_rootFile(fr".\Data\Raw_data\MIDAS\NormalMode\run02550.root")
 
     total_time = df['unix_time'].iloc[-1] - df['unix_time'].iloc[0]
     RATE = len(df) / total_time
@@ -104,7 +103,7 @@ def main():
         interval = 500, # How much time does the present frame last in ms
         blit=False
     )
-    ani.save(r".\All_plots_with_raw_data_4Ch\Plots\FullSignalAnimation.gif", writer="pillow", fps=5)
+    #ani.save(r".\All_plots_with_raw_data_4Ch\Plots\FullSignalAnimation.gif", writer="pillow", fps=5)
     plt.show()
 
 

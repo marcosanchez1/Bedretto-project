@@ -71,11 +71,11 @@ def main():
             COINCIDENCE.append(count / TOTAL_TIME)  # Rate in Hz
 
         # Fit: I noticed that from 40ns onward we have what we want, maybe even from 35ns.
-        k1 = np.where(DELTA_T >= 30 )[0][0]
+        k1 = np.where(DELTA_T >= 10 )[0][0]
         X1,Y1 = DELTA_T[:k1], COINCIDENCE[:k1]
         P1 = perform_fit(X1, Y1) # P = [m,b]
         
-        k2 = np.where(DELTA_T >= 40 )[0][0]
+        k2 = np.where(DELTA_T >= 15 )[0][0]
         X2,Y2 = DELTA_T[k2:], COINCIDENCE[k2:]
         P2 = perform_fit(X2, Y2)
         

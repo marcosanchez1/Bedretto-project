@@ -126,10 +126,6 @@ if __name__ == "__main__":
 
     # compute rate
     RATE = len(df['unix_time'])/(df['unix_time'].iloc[-1] - df['unix_time'].iloc[0])
-
-   # ____________________________________________Conditions____________________________________________________
-    # I'll add some conditions to select or discriminate events, it can be based, on raise time or charge or whatever.
-    df = discriminated_df(df, float(trigger))
     
     main(df, RATE, route_figure)
 

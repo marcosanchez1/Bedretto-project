@@ -109,7 +109,7 @@ if __name__ == "__main__":
 
     voltage = '0.015'
     run = '3'
-    day = '9'
+    day = '25'
     month = '6'
 
     #route of folder where to save the figures
@@ -117,6 +117,7 @@ if __name__ == "__main__":
 
     # route of original data, will only use it to compare with the fit and discriminate events
     route_data = fr".\Data\Raw_data\2Bar_4Ch\CoincidenceMode\COIN_CH0123_PS57V_GL15ns\Run_{voltage}V_Run{run}_Data_{month}_{day}_2026_Ascii.dat"
+    #route_data = fr".\Data\Raw_data\2Bar_4Ch\NormalMode\TriggerCh0\Run_{voltage}V_Run{run}_Data_{month}_{day}_2026_Ascii.dat"
     df = get_raw_datFile(route_data)
 
     main(df, route_figure, float(voltage))

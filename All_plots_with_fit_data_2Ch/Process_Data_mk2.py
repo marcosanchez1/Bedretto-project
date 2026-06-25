@@ -56,16 +56,6 @@ WINDOW = 30 * dt
 # 100 samples.
 baseline_window = 20
 
-# This are the folder routes that we want to process and then store the data.
-# Notice that the route is practically the same except for the second direction
-#raw_folder = r".\Data\Raw_data\1Bar_2Chs\57V_varying_gatelength_and_trigger_only"
-#processed_folder = r".\Data\Processed_data\1Bar_2Chs\57V_varying_gatelength_and_trigger_only"
-raw_folder = r".\Data\Raw_data\1Bar_2Chs"
-processed_folder = r".\Data\Processed_data\1Bar_2Chs"
-
-
-
-
 #________________________________________FUNCTIONS______________________________________________
 def process_channel_waveform(args):
     """Standalone function for multiprocessing."""
@@ -339,7 +329,7 @@ def get_FWHM(A):
     return t_right - t_left
 
 #________________________________________MAIN______________________________________________
-def main():
+def main(raw_folder, processed_folder):
 
     # Loop through all .dat files in the raw folder
     for filename in os.listdir(raw_folder):
@@ -369,7 +359,6 @@ def main():
             # File finished processing we save this time
             tf = time.time()
 
-
             print(f'File finished: {out_csv} in {tf - ti:.1f}s')
 
     print("\nAll files processed.")
@@ -378,4 +367,10 @@ def main():
 
 #________________________________________EXECUTE ONLY IF MAIN______________________________________________
 if __name__ == '__main__':
-    main()
+    # This are the folder routes that we want to process and then store the data.
+    # Notice that the route is practically the same except for the second direction
+    #raw_folder = r".\Data\Raw_data\1Bar_2Chs\57V_varying_gatelength_and_trigger_only"
+    #processed_folder = r".\Data\Processed_data\1Bar_2Chs\57V_varying_gatelength_and_trigger_only"
+    raw_folder = r".\Data\Raw_data\1Bar_2Chs"
+    processed_folder = r".\Data\Processed_data\1Bar_2Chs"
+    main(raw_folder, processed_folder)

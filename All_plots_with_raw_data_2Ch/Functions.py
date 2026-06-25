@@ -150,4 +150,4 @@ def get_t(samples, fraction):
     if len(idx) == 0:
         return len(samples) # no crossing found return full length
     
-    return idx[0] + (peak_position - interval)
+    return (idx[0] + (peak_position - interval))*dt

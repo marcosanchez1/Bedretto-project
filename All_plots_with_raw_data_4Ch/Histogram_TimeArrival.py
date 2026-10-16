@@ -99,8 +99,8 @@ def main(df, rate, route_figure):
 
 if __name__ == "__main__":
 
-    voltage = '0.005'
-    run = '1'
+    voltage = '0.020'
+    run = '4'
     day = '25'
     month = '6'
 

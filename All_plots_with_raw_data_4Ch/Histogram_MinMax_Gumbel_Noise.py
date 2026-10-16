@@ -12,11 +12,17 @@ channels,unix_time
 '''
 import numpy as np
 import matplotlib.pyplot as plt
-from Functions import rid_of_muon_signal, get_raw_data
 
 from scipy.stats import norm
 from scipy.optimize import curve_fit
 from scipy.stats import gumbel_r
+
+import sys
+import os
+# Add parent directory to Python path
+parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(parent_dir)
+from Functions import get_raw_datFile, rid_of_muon_signal
 
 def max_gaussian_pdf(x, N, mu, sigma, A):
     # Gaussian CDF and PDF
@@ -66,7 +72,7 @@ def plot_extrema(ax, data, title, N_samples):
                 ha='center', va='center')
 
     ax.set_title(title)
-    ax.set_xlabel("Value (ADC)")
+    ax.set_xlabel("Max/Min (V)")
     ax.set_ylabel("Density")
     ax.grid(True)
     ax.legend()
@@ -102,12 +108,12 @@ def main(df, rate, route_figure):
 
     # Apply to both channels
     plot_extrema(ax0, min0, f"CH0 Min (rate={rate} Hz)", N_samples)
-    plot_extrema(ax1, max0, f"CH0 Max (rate={rate} Hz)", N_samples)
+    plot_extrema(ax0, max0, f"CH0 Max (rate={rate} Hz)", N_samples)
     plot_extrema(ax2, min1, f"CH1 Min (rate={rate} Hz)", N_samples)
-    plot_extrema(ax3, max1, f"CH1 Max (rate={rate} Hz)", N_samples)
+    plot_extrema(ax2, max1, f"CH1 Max (rate={rate} Hz)", N_samples)
 
     plt.tight_layout()
-    plt.savefig(f"{route_figure}\\GumbelFit_MinMax_Noise.png")
+    #plt.savefig(f"{route_figure}\\GumbelFit_MinMax_Noise.png")
     plt.show()
     plt.close()
 
@@ -122,8 +128,8 @@ if __name__ == "__main__":
     route_figure = fr".\All_plots_with_raw_data\Plots\1Bar_2Chs\Tests"
 
     # route of original data, will only use it to compare with the fit and discriminate events
-    route_data = f".\\Data\\Raw_data\\1Bar_2Chs\\Run_{voltage}V_Run{run}_Data_{month}_{day}_2026_Ascii.dat"
-    df = get_raw_data(route_data)
+    route_data = f".\\Data\\Raw_data\\1Bar_2Ch\\Run_{voltage}V_Run{run}_Data_{month}_{day}_2026_Ascii.dat"
+    df = get_raw_datFile(route_data)
 
     # compute rate
     RATE = len(df['unix_time'])/(df['unix_time'].iloc[-1] - df['unix_time'].iloc[0])

@@ -27,10 +27,7 @@ def main():
     list_files = os.listdir(route_files)
 
     DELTA_T = np.linspace(0, 60, 200)
-
-    time_k = [10 + 1*i for i in range(11)]
     M = []
-    CS = []
     TH = []
 
     for file in list_files:
@@ -81,7 +78,6 @@ def main():
         
         M.append(P2[0]) # Noise
         TH.append(th)
-        CS.append( (P1[0] - P2[0])/(2*P2[0]**0.5)) #From solving system of equations
 
     fig, ax = plt.subplots(1, 1, figsize=(15, 10))
 
@@ -90,19 +86,9 @@ def main():
     ax.set_xlabel('Threshold (V)')
     ax.set_ylabel('Noise rate (Hz^2)')   # example label
 
-    # Second axis (right)
-    ax2 = ax.twinx()
-    ax2.plot(TH, CS, label=f'Cosmics', marker='o', linestyle='-', alpha=0.7, color='orange')
-    ax2.set_ylabel('Cosmic rate (Hz)')  # example label
-
     # Title, grid, legends
-    ax.set_title('Noise and Cosmics vs Threshold')
+    ax.set_title('Noise vs Threshold')
     ax.grid(True)
-
-    # Two legends (combine handles)
-    h1, l1 = ax.get_legend_handles_labels()
-    h2, l2 = ax2.get_legend_handles_labels()
-    ax.legend(h1 + h2, l1 + l2, loc='upper right')
 
     plt.tight_layout()
     plt.show()

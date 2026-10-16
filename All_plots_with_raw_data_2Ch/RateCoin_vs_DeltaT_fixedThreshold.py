@@ -36,7 +36,9 @@ def r2(y_data, y_fit):
 
 def main():
     dt = 0.3125  # ns
-    route_files = r".\Data\Raw_data\1Bar_2Ch\57V_TriggerCh0_VaryTrigger"
+    #route_files = r".\Data\Raw_data\1Bar_2Ch\57V_TriggerCh0_VaryTrigger"
+    route_files = r".\Data\Raw_data\2Bar_4Ch\CoincidenceMode\COIN_CH0123_PS57V_GL15ns"
+    
     list_files = os.listdir(route_files)
     
     fig, ax = plt.subplots(figsize=(10, 10))

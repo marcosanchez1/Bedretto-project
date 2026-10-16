@@ -31,7 +31,8 @@ def main(df, rate, route_figure):
     fig, ax = plt.subplots(1, 1, figsize=(10, 10))
 
     # Histogram (density=False so we fit counts)
-    bins = int(round(np.sqrt(len(time_diff))))
+    N = 0.4
+    bins = int(round(N * np.sqrt(len(time_diff))))
     counts, bin_edges = np.histogram(time_diff, bins=bins)
 
     # Bin centers
@@ -46,14 +47,13 @@ def main(df, rate, route_figure):
     P, pcov = curve_fit(gaussian, bin_centers, counts, p0=[A0, mu0, sigma0])
 
     # Plot histogram
-    ax.hist(time_diff, bins=bins, histtype='step', density=False, label="Data")
+    ax.hist(time_diff, bins=bins, histtype='step', density=False, label=f"bins={bins}")
 
     # Plot fitted Gaussian
     x_fit = np.linspace(min(time_diff), max(time_diff), 500)
-    ax.plot(x_fit, gaussian(x_fit, *P), 'r-', 
-            label=f"Fit: μ={P[1]:.3f}, σ={P[2]:.3f}")
+    #ax.plot(x_fit, gaussian(x_fit, *P), 'r-', label=f"Fit: μ={P[1]:.3f}, σ={P[2]:.3f}")
 
-    ax.set_title(f"TimeDifference(t1 - t0) Distribution (N={len(time_diff)}, rate={rate} Hz)")
+    ax.set_title(f"TimeDifference(t1 - t0) Distribution (events={len(time_diff)}, rate={rate} Hz)")
     ax.set_xlabel("Time Difference (ns)")
     ax.set_ylabel("Counts")
     ax.legend()
@@ -66,8 +66,8 @@ def main(df, rate, route_figure):
 
 if __name__ == "__main__":
 
-    voltage = '0.015'
-    run = '9'
+    voltage = '0.020'
+    run = '10'
     day = '5'
     month = '5'
 

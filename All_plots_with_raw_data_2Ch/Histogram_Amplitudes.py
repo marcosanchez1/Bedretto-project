@@ -12,7 +12,7 @@ channels,unix_time
 '''
 import numpy as np
 import matplotlib.pyplot as plt
-from Functions import rid_of_muon_signal, get_raw_data
+from Functions import rid_of_muon_signal, get_raw_datFile
 
 dt = 0.3125
 def main(df, rate, route_figure):
@@ -20,22 +20,16 @@ def main(df, rate, route_figure):
     max0 = []
     max1 = []
     for row in df['channels']:
-        ch0 = np.array(row[0])
+        ch0 = np.array(row[2])
         baseline_0 = np.mean(ch0[:100]) #To compute baseline we should only take like first 100 samples nothing too far.
         ch0_corr = ch0 - baseline_0
 
-        ch1 = np.array(row[1])
+        ch1 = np.array(row[3])
         baseline_1 = np.mean(ch1[:100])   # or median
         ch1_corr = ch1 - baseline_1
         
-        Amp0 = np.max(ch0_corr)
-        Amp1 = np.max(ch1_corr)
-
-        if ~(abs(Amp0 - Amp1) < 0.05):
-            max0.append(Amp0)
-            max1.append(Amp1)
-
-    rate = int(round(len(max0) / len(df) * rate, 0))
+        max0.append(np.max(ch0_corr))
+        max1.append(np.max(ch1_corr))
 
     fig, ax = plt.subplots(1, 2, figsize=(10, 10))
     ax0, ax1 = ax.flatten()
@@ -50,9 +44,9 @@ def main(df, rate, route_figure):
             range=[min(max0), max(max0)],
             histtype='step'
             )
-    ax0.set_title(f"Max_CH0 (samples={len(max0)};rate={rate}Hz)")
+    ax0.set_title(f"Max_CH2 (samples={len(max0)};rate={rate}Hz)")
     ax0.set_ylabel("Counts")
-    ax0.set_xlabel("Max_CH0 (ADC)")
+    ax0.set_xlabel("Max_CH2 (ADC)")
     ax0.legend()
     ax0.grid(True)
 
@@ -65,9 +59,9 @@ def main(df, rate, route_figure):
             range=[min(max1), max(max1)],
             histtype='step'
             )
-    ax1.set_title(f"Max_CH1 (samples={len(max1)};rate={rate}Hz)")
+    ax1.set_title(f"Max_CH3 (samples={len(max1)};rate={rate}Hz)")
     ax1.set_ylabel("Counts")
-    ax1.set_xlabel("Max_CH1 (ADC)")
+    ax1.set_xlabel("Max_CH3 (ADC)")
     ax1.legend()
     ax1.grid(True)
 
@@ -80,17 +74,17 @@ def main(df, rate, route_figure):
 
 if __name__ == "__main__":
 
-    voltage = '0.003'
-    run = '17'
-    day = '6'
-    month = '5'
+    voltage = '0.005'
+    run = '1'
+    day = '18'
+    month = '6'
 
     #route of folder where to save the figures
-    route_figure = fr".\All_plots_with_raw_data\Plots\1Bar_2Chs\57Vcoincidence\Run_{voltage}V_Run{run}_Data_{month}_{day}_2026_Ascii"
+    route_figure = fr".\All_plots_with_raw_data_2Ch\Plots"
 
     # route of original data, will only use it to compare with the fit and discriminate events
-    route_data = fr".\Data\Raw_data\1Bar_2Chs\57Vcoincidence\Run_{voltage}V_Run{run}_Data_{month}_{day}_2026_Ascii.dat"
-    df = get_raw_data(route_data)
+    route_data = fr".\Data\Raw_data\1Bar_2Ch\Coin_Ch2Ch3_15ns\Run_{voltage}V_Run{run}_Data_{month}_{day}_2026_Ascii.dat"
+    df = get_raw_datFile(route_data)
 
     #df = df[df["channels"].apply(lambda row: np.argmax(row[0])*dt > 200 and np.argmax(row[0])*dt < 250)
     #                & df["channels"].apply(lambda row: np.argmax(row[1])*dt > 200 and np.argmax(row[1])*dt < 250)]

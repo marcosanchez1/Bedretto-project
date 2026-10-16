@@ -72,14 +72,14 @@ def main(df, route_figure, trigger):
     axs[0, 0].hist(DELTA_X, bins=N_bins, histtype='step', color='green', alpha=0.7, label=f'bins={N_bins}')
     axs[0, 0].set_title(f'x - x\' Distribution (samples={len(DELTA_X)})')
     axs[0, 0].set_xlabel('Position (cm)')
-    axs[0, 0].set_ylabel('Frequency')
+    axs[0, 0].set_ylabel('Counts')
     axs[0, 0].legend()
     axs[0, 0].grid(True)
 
     axs[0, 1].hist(DELTA_T, bins=N_bins, histtype='step', color='red', alpha=0.7, label=f'bins={N_bins}')
     axs[0, 1].set_title(f't\' - t Distribution (samples={len(DELTA_T)})')
     axs[0, 1].set_xlabel('Time (ns)')
-    axs[0, 1].set_ylabel('Frequency')
+    axs[0, 1].set_ylabel('Counts')
     axs[0, 1].legend()
     axs[0, 1].grid(True)
 
@@ -93,7 +93,7 @@ def main(df, route_figure, trigger):
     axs[1, 1].hist(SPEED, bins=N_bins, histtype='step', color='blue', alpha=0.7, label=f'bins={N_bins}')
     axs[1, 1].set_title(f'v Distribution (samples={len(SPEED)})')
     axs[1, 1].set_xlabel('Speed (cm/ns)')
-    axs[1, 1].set_ylabel('Frequency')
+    axs[1, 1].set_ylabel('Counts')
     axs[1, 1].legend()
     axs[1, 1].grid(True)
 
@@ -107,8 +107,8 @@ def main(df, route_figure, trigger):
 if __name__ == "__main__":
     print('\nStart execution.\n')
 
-    voltage = '0.015'
-    run = '3'
+    voltage = '0.020'
+    run = '4'
     day = '25'
     month = '6'
 

@@ -122,7 +122,7 @@ def main():
         delta_t = t1 - t0
 
         if abs(delta_t) > 15:
-            frames.append(i)
+        frames.append(i)
     len(frames)
     ani = animation.FuncAnimation(
         fig,

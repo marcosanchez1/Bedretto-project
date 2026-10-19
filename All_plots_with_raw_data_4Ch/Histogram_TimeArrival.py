@@ -11,7 +11,13 @@ channels,unix_time
 '''
 import numpy as np
 import matplotlib.pyplot as plt
-from Functions import get_raw_datFile, get_t
+import sys
+import os
+
+# Add parent directory to Python path
+parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(parent_dir)
+from Functions import get_raw_datFile, get_t_with_samples
 
 dt = 0.3125
 def main(df, rate, route_figure):
@@ -21,10 +27,10 @@ def main(df, rate, route_figure):
     t2 = []
     t3 = []
     for row in df['channels']:
-        t0.append(get_t(row[0],0.2))
-        t1.append(get_t(row[1],0.2))
-        t2.append(get_t(row[2],0.2))
-        t3.append(get_t(row[3],0.2))
+        t0.append(get_t_with_samples(row[0],0.2))
+        t1.append(get_t_with_samples(row[1],0.2))
+        t2.append(get_t_with_samples(row[2],0.2))
+        t3.append(get_t_with_samples(row[3],0.2))
 
     fig, ax = plt.subplots(2, 2, figsize=(10, 10))
     ax0, ax1, ax2, ax3 = ax.flatten()

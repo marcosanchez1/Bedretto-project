@@ -82,7 +82,7 @@ if __name__ == "__main__":
     month = '10'
 
     route_figure = fr".\External_Trigger_Tests_Scripts\Plots"
-    route_data = fr".\Data\Raw_data\ExternalTriggerTests\TriggerCh0_{trigger}_NoCoincidence\Run_900V_Run1_Data_10_13_2026_Ascii.dat"
+    route_data = fr".\Data\Raw_data\ExternalTriggerTests\TriggerCh0_{trigger}_NoCoincidence\Run_1050V_Run0_Data_10_15_2026_Ascii.dat"
 
     df = get_raw_datFile(route_data)
 

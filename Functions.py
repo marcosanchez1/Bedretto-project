@@ -230,11 +230,3 @@ def perform_fit_on_dataframe(df, n_jobs=-1):
     }
 
     return pd.DataFrame(new_df)
-
-def cfd_method(CF, a):
-
-    #tp = a[1] + (a[3] * np.sqrt(-np.log(CF**2)))/(1 - a[2] * np.sqrt(-np.log(CF**2)))
-    tm = a[1] - (a[3] * np.sqrt(-np.log(CF**2)))/(1 + a[2] * np.sqrt(-np.log(CF**2)))
-
-    #return tp, tm
-    return tm # Accordig to what I saw this is the correct solution.

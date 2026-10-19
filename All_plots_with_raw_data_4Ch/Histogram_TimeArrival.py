@@ -27,15 +27,15 @@ def main(df, rate, route_figure):
     t2 = []
     t3 = []
     for row in df['channels']:
-        t0.append(get_t_with_samples(row[0],0.2))
-        t1.append(get_t_with_samples(row[1],0.2))
-        t2.append(get_t_with_samples(row[2],0.2))
-        t3.append(get_t_with_samples(row[3],0.2))
+        t0.append(get_t_with_samples(row[0],0.1))
+        t1.append(get_t_with_samples(row[1],0.1))
+        t2.append(get_t_with_samples(row[2],0.1))
+        t3.append(get_t_with_samples(row[3],0.1))
 
     fig, ax = plt.subplots(2, 2, figsize=(10, 10))
     ax0, ax1, ax2, ax3 = ax.flatten()
     
-    N = 3
+    N = 1
     bins0 = int(round(N * np.sqrt(len(t0)),0))
     h0 = ax0.hist(
             t0,
@@ -106,7 +106,7 @@ def main(df, rate, route_figure):
 if __name__ == "__main__":
 
     voltage = '0.020'
-    run = '4'
+    run = '5'
     day = '25'
     month = '6'
 

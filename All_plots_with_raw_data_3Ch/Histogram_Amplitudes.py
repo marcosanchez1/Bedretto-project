@@ -103,25 +103,20 @@ def main(df, rate, route_figure):
 
 if __name__ == "__main__":
 
-    voltage = '0.002'
-    run = '3'
-    day = '13'
-    month = '8'
+    trigger = '0.005'
+    voltage = '57'
+    run = '1'
+    day = '16'
+    month = '10'
 
-    #route of folder where to save the figures
     route_figure = fr".\All_plots_with_raw_data_3Ch\Plots"
+    route_data = fr".\Data\Raw_data\2Bar_3Ch\OpticalGreaseTests\AfterOptical_CoinTriggerCh0Ch1Ch2_{voltage}V\Run_{trigger}V_Run{run}_Data_{month}_{day}_2026_Ascii"
 
-    # route of original data, will only use it to compare with the fit and discriminate events
-    route_data = fr".\Data\Raw_data\10Bar_3Ch\Run_{voltage}V_Run{run}_Data_{month}_{day}_2026_Ascii"
-
-    
-    # Get data frame from .dat or .root file
     df = get_raw_datFile(route_data + ".dat")
-        
-    # compute rate
-    RATE = len(df['unix_time'])/(df['unix_time'].iloc[-1] - df['unix_time'].iloc[0])
-    RATE = int(round(RATE, 0))
+
+    RATE = len(df['unix_time']) / (df['unix_time'].iloc[-1] - df['unix_time'].iloc[0])
+    RATE = round(RATE, 3)
 
     main(df, RATE, route_figure)
-    
+
     print("\nEnd of execution.\n")

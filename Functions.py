@@ -156,27 +156,37 @@ def f(t, A):
     return F
 
 # This function will perform a fit on the samples of the signal and return the optimized parameters.
-def perform_fit_on_samples(t, samples, baseline):
+def perform_fit_on_samples(samples, baseline):
+
+    peak_position = np.argmax(np.abs(samples-baseline))
+
+    left  = 0
+    right = min(len(samples), peak_position+10) # I'm gonna keep this, at the end we're only interested up to the peak.
+
+    t = np.arange(left, right) * dt
+    samples = samples[left:right]
 
     # amplitude guess works for positive or negative pulses
     A0 = np.max(np.abs(samples - baseline))
 
     # time of maximum absolute deviation
-    A1 = np.argmax(np.abs(samples - baseline)) * dt
+    A1 = peak_position * dt
 
     # shape parameters initial guesses
-    A2 = 0.01
+    A2 = 1/A1
     A3 = np.abs(A2) * A1
-    A4 = 0.01
+    A4 = 5/A1
     A5 = np.abs(A4) * A1
     A6 = baseline
 
     p0 = np.array([A0, A1, A2, A3, A4, A5, A6], dtype=float)
 
     # bounds allow negative pulses
-    lower = np.array([-2*A0, A1-5, -1, 0, -2, 0, baseline - 2], dtype=float)
-    upper = np.array([ 2*A0, A1+5,  1, 10,  2, 10, baseline + 2], dtype=float)
-
+    #lower = np.array([-2*A0, A1-5, -1, 0, -2, 0, baseline - 2], dtype=float)
+    #upper = np.array([ 2*A0, A1+5,  1, 10,  2, 10, baseline + 2], dtype=float)
+    lower = np.array([-2*A0, A1-5, -0.1, 0, -0.1, 0.1, baseline - 2])
+    upper = np.array([ 2*A0, A1+5,  0.1, 5,  0.1, 5.0, baseline + 2])
+    
     def residuals(params):
         return f(t, params) - samples
 
@@ -184,8 +194,8 @@ def perform_fit_on_samples(t, samples, baseline):
         residuals,
         p0,
         bounds=(lower, upper),
-        max_nfev=500,
-        method="dogbox"
+        max_nfev=100,
+        method="trf"
     )
     return res.x
 
@@ -200,11 +210,6 @@ def perform_fit_on_dataframe(df, n_jobs=-1):
     n_jobs=-1 uses all available CPU cores.
     """
 
-    # Precompute t array once if all waveforms have same length
-    # Otherwise compute inside the worker
-    sample_length = len(next(iter(df['channels'][0].values())))
-    t_global = np.arange(sample_length) * dt
-
     def fit_single_event(samples):
         """
         Fit all channels for a single event.
@@ -213,7 +218,7 @@ def perform_fit_on_dataframe(df, n_jobs=-1):
         row = {}
         for ch_id, ch_samples in samples.items():
             baseline = np.mean(ch_samples[:50])
-            optimized_params = perform_fit_on_samples(t_global, ch_samples, baseline)
+            optimized_params = perform_fit_on_samples(ch_samples, baseline)
             row[ch_id] = optimized_params
         return row
 

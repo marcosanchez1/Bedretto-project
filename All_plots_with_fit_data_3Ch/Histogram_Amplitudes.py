@@ -79,12 +79,12 @@ if __name__ == "__main__":
 
     trigger = '0.005'
     voltage = '57'
-    run = '0'
-    day = '12'
+    run = '1'
+    day = '16'
     month = '10'
 
     route_figure = fr".\All_plots_with_fit_data_3Ch\Plots"
-    route_data = fr".\Data\Raw_data\2Bar_3Ch\ExternalTriggerTests\AfterOptical_NoCoinTriggerCh0_{voltage}V\Run_{trigger}V_Run{run}_Data_{month}_{day}_2026_Ascii"
+    route_data = fr".\Data\Raw_data\2Bar_3Ch\OpticalGreaseTests\AfterOptical_CoinTriggerCh0Ch1Ch2_{voltage}V\Run_{trigger}V_Run{run}_Data_{month}_{day}_2026_Ascii"
 
     df = get_raw_datFile(route_data + ".dat")
     df = perform_fit_on_dataframe(df)

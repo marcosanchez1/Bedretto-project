@@ -10,19 +10,32 @@ import os
 # Add parent directory to Python path
 parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(parent_dir)
-from Functions import get_raw_datFile, perform_fit_on_dataframe
+from Functions import get_raw_datFile, get_t_with_fit, perform_fit_on_dataframe
 
 dt = 0.3125
 def main(df_before, df_after, rate_before, rate_after, route_figure):
 
         # Extract amplitudes (sample 0 = peak)
-        Amplitude_ch0_before = [row[0][0] for row in df_before['channels']]
-        Amplitude_ch1_before = [row[1][0] for row in df_before['channels']]
-        Amplitude_ch2_before = [row[2][0] for row in df_before['channels']]
+        max0_b, max1_b, max2_b = [], [], []
+        for row in df_before['channels']:
+                t0 = get_t_with_fit(row[0], 0.1)
+                t1 = get_t_with_fit(row[1], 0.1)
+                t2 = get_t_with_fit(row[2], 0.1)
+                if abs(t1 - t0) < 11 and abs(t1 - t2) <  11:
+                        max0_b.append(row[0][0])
+                        max1_b.append(row[1][0])
+                        max2_b.append(row[2][0])
 
-        Amplitude_ch0_after = [row[0][0] for row in df_after['channels']]
-        Amplitude_ch1_after = [row[1][0] for row in df_after['channels']]
-        Amplitude_ch2_after = [row[2][0] for row in df_after['channels']]
+        
+        max0_a, max1_a, max2_a = [], [], []
+        for row in df_after['channels']:
+                t0 = get_t_with_fit(row[0], 0.1)
+                t1 = get_t_with_fit(row[1], 0.1)
+                t2 = get_t_with_fit(row[2], 0.1)
+                if abs(t1 - t0) < 11 and abs(t1 - t2) <  11:
+                        max0_a.append(row[0][0])
+                        max1_a.append(row[1][0])
+                        max2_a.append(row[2][0])
 
         fig = plt.figure(figsize=(10, 10))
 
@@ -74,9 +87,9 @@ def main(df_before, df_after, rate_before, rate_after, route_figure):
         # -----------------------------
         # Fit each channel
         # -----------------------------
-        plot(ax0, Amplitude_ch0_before, Amplitude_ch0_after, "CH0", rate_before, rate_after)
-        plot(ax1, Amplitude_ch1_before, Amplitude_ch1_after, "CH1", rate_before, rate_after)
-        plot(ax2, Amplitude_ch2_before, Amplitude_ch2_after, "CH2", rate_before, rate_after)
+        plot(ax0, max0_b, max0_a, "CH0", rate_before, rate_after)
+        plot(ax1, max1_b, max1_a, "CH1", rate_before, rate_after)
+        plot(ax2, max2_b, max2_a, "CH2", rate_before, rate_after)
 
         plt.tight_layout()
         plt.savefig(f"{route_figure}\\Amp_Histograms_Bars.png")
@@ -97,8 +110,8 @@ if __name__ == "__main__":
 
         route_figure = fr".\All_plots_with_fit_data_3Ch\Plots"
 
-        route_data_before = fr".\Data\Raw_data\2Bar_3Ch\OpticalGreaseTests\BeforeOptical_NoCoinTriggerCh0_{voltage}V\Run_{trigger}V_Run{run}_Data_{month}_{day}_2026_Ascii.dat"
-        route_data_after = fr".\Data\Raw_data\2Bar_3Ch\OpticalGreaseTests\AfterOptical_NoCoinTriggerCh0_{voltage}V\Run_{trigger}V_Run1_Data_{month}_16_2026_Ascii.dat"
+        route_data_before = fr".\Data\Raw_data\2Bar_3Ch\OpticalGreaseTests\BeforeOptical_CoinTriggerCh0Ch1Ch2_{voltage}V\Run_{trigger}V_Run{run}_Data_{month}_{day}_2026_Ascii.dat"
+        route_data_after = fr".\Data\Raw_data\2Bar_3Ch\OpticalGreaseTests\AfterOptical_CoinTriggerCh0Ch1Ch2_{voltage}V\Run_{trigger}V_Run1_Data_{month}_16_2026_Ascii.dat"
 
         df_before = get_raw_datFile(route_data_before)
         df_before = perform_fit_on_dataframe(df_before)

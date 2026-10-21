@@ -29,14 +29,13 @@ max_number_samples = 1024
 def main():
     voltage = 57
     trigger = '0.005'
-    day = 12
+    day = 16
     month = 10
-    run = 0
+    run = 1
 
     # Load raw data
-    df = get_raw_datFile(fr".\Data\Raw_data\2Bar_3Ch\OpticalGreseTests\BeforeOptical_CoinTriggerCh0Ch1Ch2_{voltage}V\Run_{trigger}V_Run{run}_Data_{month}_{day}_2026_Ascii.dat")
+    df = get_raw_datFile(fr".\Data\Raw_data\2Bar_3Ch\OpticalGreaseTests\AfterOptical_CoinTriggerCh0Ch1Ch2_{voltage}V\Run_{trigger}V_Run{run}_Data_{month}_{day}_2026_Ascii.dat")
     df_fit = perform_fit_on_dataframe(df)
-    #df = perform_fit_on_dataframe(get_raw_rootFile(fr".\Data\Raw_data\MIDAS\run02594.root"))
 
     trigger = float(trigger)
 
@@ -57,9 +56,6 @@ def main():
     line_1, = axs[0].plot([], [], label=f"CH1")
     line_0_fit, = axs[0].plot([], [], label=f"CH0 fit")
     line_1_fit, = axs[0].plot([], [], label=f"CH1 fit")
-
-    line_0_tp, = axs[0].plot([], [], label=f"CH0 tp", color="red")
-    line_1_tp, = axs[0].plot([], [], label=f"CH1 tp", color="blue")
 
     axs[0].set_xlim(-0.1, max_number_samples*dt)
     axs[0].set_ylim((np.min(ch1)>np.min(ch0))*(np.min(ch0))+(np.min(ch1)<np.min(ch0))*(np.min(ch1)) - 0.005,
@@ -92,9 +88,6 @@ def main():
         t_ch0 = np.arange(len(samples0))*dt
         line_0.set_data(t_ch0, samples0)
         line_0_fit.set_data(t_ch0, f(t_ch0, df_fit['channels'].iloc[frame][0]))
-
-        tp = get_t_with_fit(df_fit['channels'].iloc[frame][0], 0.1)
-        line_0_tp.set_data([tp, tp], [-10, 10])
         
         # Channel 1
         samples1 = ch1[frame]
@@ -102,27 +95,22 @@ def main():
         line_1.set_data(t_ch1, samples1)
         line_1_fit.set_data(t_ch1, f(t_ch1, df_fit['channels'].iloc[frame][1]))
 
-        tp = get_t_with_fit(df_fit['channels'].iloc[frame][1], 0.1)
-        line_1_tp.set_data([tp, tp], [-10, 10])
-
         # Channel 2
         samples2 = ch2[frame]
         t_ch2 = np.arange(len(samples2))*dt
         line_2.set_data(t_ch2, samples2)
         line_2_fit.set_data(t_ch2, f(t_ch2, df_fit['channels'].iloc[frame][2]))
 
-        title = axs[0].set_title(f'Waveforms; Event {frame}; rate={int(round(RATE,0))}Hz')
+        title = axs[0].set_title(f'Waveforms; Event {frame}; rate={round(RATE,3)}Hz')
 
-        return line_0, line_1, line_2, title, line_0_fit, line_1_fit, line_2_fit, line_0_tp, line_1_tp
+        return line_0, line_1, line_2, title, line_0_fit, line_1_fit, line_2_fit
 
     frames = []
     for i in range(len(df_fit)):
-        t0 = get_t_with_fit(df_fit['channels'].iloc[i][0], 0.1)
-        t1 = get_t_with_fit(df_fit['channels'].iloc[i][1], 0.1)
-        delta_t = t1 - t0
+        amplitude2 = df_fit['channels'].iloc[i][2][0]
 
-        if abs(delta_t) > 15:
-        frames.append(i)
+        if amplitude2 > 0.35:
+            frames.append(i)
     len(frames)
     ani = animation.FuncAnimation(
         fig,
@@ -131,7 +119,7 @@ def main():
         interval = 500, # How much time does the present frame last in ms
         blit=False
     )
-    ani.save(r".\All_plots_with_fit_data_3Ch\Plots\FullSignalAnimation.gif", writer="pillow", fps=5)
+    #ani.save(r".\All_plots_with_fit_data_3Ch\Plots\FullSignalAnimation.gif", writer="pillow", fps=5)
     plt.show()
     plt.close()
 

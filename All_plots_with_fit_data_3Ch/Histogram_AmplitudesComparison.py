@@ -13,7 +13,7 @@ sys.path.append(parent_dir)
 from Functions import get_raw_datFile, get_t_with_fit, perform_fit_on_dataframe
 
 dt = 0.3125
-def main(df_before, df_after, rate_before, rate_after, route_figure):
+def main(df_before, df_after, route_figure):
 
         # Extract amplitudes (sample 0 = peak)
         max0_b, max1_b, max2_b = [], [], []
@@ -25,6 +25,7 @@ def main(df_before, df_after, rate_before, rate_after, route_figure):
                         max0_b.append(row[0][0])
                         max1_b.append(row[1][0])
                         max2_b.append(row[2][0])
+        rate_before = round(len(max0_b) / (df_before['unix_time'].iloc[-1] - df_before['unix_time'].iloc[0]), 3)
 
         
         max0_a, max1_a, max2_a = [], [], []
@@ -36,6 +37,7 @@ def main(df_before, df_after, rate_before, rate_after, route_figure):
                         max0_a.append(row[0][0])
                         max1_a.append(row[1][0])
                         max2_a.append(row[2][0])
+        rate_after = round(len(max0_a) / (df_after['unix_time'].iloc[-1] - df_after['unix_time'].iloc[0]), 3)
 
         fig = plt.figure(figsize=(10, 10))
 
@@ -54,32 +56,35 @@ def main(df_before, df_after, rate_before, rate_after, route_figure):
         # -----------------------------
         def plot(ax, data_before, data_after, ch_label, rate_before, rate_after):
 
-                N = 2
-                bins = int(round(N * np.sqrt(len(data_before)), 0))
+                N = 1
+                bins_before = int(round(N * np.sqrt(len(data_before)), 0))
+                bins_after = int(round(N * np.sqrt(len(data_after)), 0))
 
                 # Plot histogram
                 ax.hist(
                         data_before,
-                        bins=bins,
+                        bins=bins_before,
                         alpha=0.7,
-                        label=f"Before - bins={bins}",
+                        label=f"Before - bins={bins_before}",
                         range=[min(data_before), max(data_before)],
-                        histtype='step'
+                        histtype='step',
+                        density=True
                 )
                 ax.hist(
                         data_after,
-                        bins=bins,
+                        bins=bins_after,
                         alpha=0.7,
-                        label=f"After - bins={bins}",
+                        label=f"After - bins={bins_after}",
                         range=[min(data_after), max(data_after)],
-                        histtype='step'
+                        histtype='step',
+                        density=True
                 )
 
                 # Labels
                 ax.set_title(
-                        f"{ch_label} amplitude (N={len(data_before)}, rate_before={rate_before}Hz, rate_after={rate_after}Hz)"
+                        f"{ch_label} amplitude ((N,rate)_before=({len(data_before)}, {rate_before}Hz), after=({len(data_after)}, {rate_after}Hz))"
                 )
-                ax.set_ylabel("Counts")
+                ax.set_ylabel("Frequency")
                 ax.set_xlabel(f"Amplitude {ch_label} (V)")
                 ax.legend()
                 ax.grid(True)
@@ -92,8 +97,8 @@ def main(df_before, df_after, rate_before, rate_after, route_figure):
         plot(ax2, max2_b, max2_a, "CH2", rate_before, rate_after)
 
         plt.tight_layout()
-        plt.savefig(f"{route_figure}\\Amp_Histograms_Bars.png")
         plt.show()
+        plt.savefig(f"{route_figure}\\Amp_HistogramComparison.png")
         plt.close()
 
         return 0
@@ -119,12 +124,6 @@ if __name__ == "__main__":
         df_after = get_raw_datFile(route_data_after)
         df_after = perform_fit_on_dataframe(df_after)
 
-        rate_before = len(df_before['unix_time']) / (df_before['unix_time'].iloc[-1] - df_before['unix_time'].iloc[0])
-        rate_before = round(rate_before, 3)
-
-        rate_after = len(df_after['unix_time']) / (df_after['unix_time'].iloc[-1] - df_after['unix_time'].iloc[0])
-        rate_after = round(rate_after, 3)
-
-        main(df_before, df_after, rate_before, rate_after, route_figure)
+        main(df_before, df_after, route_figure)
 
         print("\nEnd of execution.\n")

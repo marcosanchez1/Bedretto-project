@@ -13,7 +13,7 @@ sys.path.append(parent_dir)
 from Functions import get_raw_datFile, perform_fit_on_dataframe, get_t_with_fit
 
 dt = 0.3125
-def main(df, rate, route_figure):
+def main(df, route_figure):
 
         max0, max1, max2, time_difference_01 = [], [], [], []
         for row in df['channels']:
@@ -25,6 +25,7 @@ def main(df, rate, route_figure):
                         max1.append(row[1][0])
                         max2.append(row[2][0])
                         time_difference_01.append(t1 - t0)
+        rate = round(len(max0) / (df['unix_time'].iloc[-1] - df['unix_time'].iloc[0]), 3)
 
         fig = plt.figure(figsize=(10, 10))
 
@@ -85,19 +86,16 @@ if __name__ == "__main__":
 
     trigger = '0.005'
     voltage = '57'
-    run = '1'
-    day = '16'
+    run = '0'
+    day = '12'
     month = '10'
 
     route_figure = fr".\All_plots_with_fit_data_3Ch\Plots"
-    route_data = fr".\Data\Raw_data\2Bar_3Ch\OpticalGreaseTests\AfterOptical_CoinTriggerCh0Ch1Ch2_{voltage}V\Run_{trigger}V_Run{run}_Data_{month}_{day}_2026_Ascii"
+    route_data = fr".\Data\Raw_data\2Bar_3Ch\OpticalGreaseTests\BeforeOptical_CoinTriggerCh0Ch1Ch2_{voltage}V\Run_{trigger}V_Run{run}_Data_{month}_{day}_2026_Ascii"
 
     df = get_raw_datFile(route_data + ".dat")
     df = perform_fit_on_dataframe(df)
 
-    RATE = len(df['unix_time']) / (df['unix_time'].iloc[-1] - df['unix_time'].iloc[0])
-    RATE = round(RATE, 3)
-
-    main(df, RATE, route_figure)
+    main(df, route_figure)
 
     print("\nEnd of execution.\n")

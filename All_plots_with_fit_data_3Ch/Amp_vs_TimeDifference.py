@@ -13,18 +13,19 @@ sys.path.append(parent_dir)
 from Functions import get_raw_datFile, perform_fit_on_dataframe, get_t_with_fit
 
 dt = 0.3125
-def main(df, rate, route_figure):
+def main(df, route_figure):
 
         max0, max1, max2, time_difference_01 = [], [], [], []
         for row in df['channels']:
                 t0 = get_t_with_fit(row[0], 0.1)
                 t1 = get_t_with_fit(row[1], 0.1)
                 t2 = get_t_with_fit(row[2], 0.1)
-                if abs(t1 - t0) < 11 and abs(t1 - t2) <  11:
+                if True:#abs(t1 - t0) < 11 and abs(t1 - t2) <  11:
                         max0.append(row[0][0])
                         max1.append(row[1][0])
                         max2.append(row[2][0])
                         time_difference_01.append(t1 - t0)
+        rate = round(len(max0) / (df['unix_time'].iloc[-1] - df['unix_time'].iloc[0]), 3)
 
         fig = plt.figure(figsize=(10, 10))
 
@@ -61,7 +62,7 @@ def main(df, rate, route_figure):
                         f"Time difference(t0-t1) vs {ch_label} amplitude (N={len(data_x)}, rate={rate}Hz)"
                 )
                 ax.set_ylabel(f"Amplitude {ch_label} (V)")
-                ax.set_xlabel(f"Time Difference {ch_label} (ns)")
+                ax.set_xlabel(f"Time Difference (ns)")
                 ax.grid(True)
 
         # -----------------------------
@@ -72,8 +73,8 @@ def main(df, rate, route_figure):
         plot(ax2, time_difference_01, max2, "CH2", rate)
 
         plt.tight_layout()
-        plt.savefig(f"{route_figure}\\TimeDifference_vs_Amp_histos.png")
         plt.show()
+        plt.savefig(f"{route_figure}\\TimeDifference_vs_Amp_histos.png")
         plt.close()
 
         return 0
@@ -95,9 +96,6 @@ if __name__ == "__main__":
     df = get_raw_datFile(route_data + ".dat")
     df = perform_fit_on_dataframe(df)
 
-    RATE = len(df['unix_time']) / (df['unix_time'].iloc[-1] - df['unix_time'].iloc[0])
-    RATE = round(RATE, 3)
-
-    main(df, RATE, route_figure)
+    main(df, route_figure)
 
     print("\nEnd of execution.\n")

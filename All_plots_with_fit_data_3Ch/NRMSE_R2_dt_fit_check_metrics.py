@@ -1,3 +1,9 @@
+'''
+This script computes and visualizes the R², NRMSE, and timing error metrics for the fit of the data in the provided dataframe,
+remember that the fit only works up to the peak.
+It generates histograms for each metric across three channels (CH0, CH1, CH2) and saves the plots to the specified directory.
+'''
+
 import numpy as np
 import matplotlib.pyplot as plt
 import sys
@@ -10,8 +16,6 @@ sys.path.append(parent_dir)
 from Functions import (
     get_raw_datFile,
     perform_fit_on_dataframe,
-    get_t_with_fit,
-    get_t_with_samples,
     f
 )
 
@@ -36,7 +40,7 @@ def compute_metrics(samples, fit):
     rmse = np.sqrt(np.mean(residuals**2))
 
     amplitude = np.max(samples) - np.min(samples)
-
+#
     if amplitude > 0:
         nrmse = rmse / amplitude
     else:
@@ -76,10 +80,6 @@ def main(df, df_fit, route_figure):
     nrmse_ch1 = []
     nrmse_ch2 = []
 
-    dt_error_ch0 = []
-    dt_error_ch1 = []
-    dt_error_ch2 = []
-
     # ------------------------------------
     # Loop over events
     # ------------------------------------
@@ -112,26 +112,6 @@ def main(df, df_fit, route_figure):
                 fit_values
             )
 
-            # ------------------------
-            # Timing difference
-            # ------------------------
-
-            try:
-
-                t_fit = get_t_with_fit(
-                    fit_pars,
-                    0.1
-                )
-
-                t_samples = get_t_with_samples(
-                    samples,
-                    0.1
-                )
-
-                delta_t = t_fit - t_samples
-
-            except:
-                delta_t = np.nan
 
             # ------------------------
             # Store
@@ -140,17 +120,14 @@ def main(df, df_fit, route_figure):
             if ch == 0:
                 r2_ch0.append(r2)
                 nrmse_ch0.append(nrmse)
-                dt_error_ch0.append(delta_t)
 
             elif ch == 1:
                 r2_ch1.append(r2)
                 nrmse_ch1.append(nrmse)
-                dt_error_ch1.append(delta_t)
 
             elif ch == 2:
                 r2_ch2.append(r2)
                 nrmse_ch2.append(nrmse)
-                dt_error_ch2.append(delta_t)
 
     # ------------------------------------
     # Figure 1 : R²
@@ -222,41 +199,6 @@ def main(df, df_fit, route_figure):
     plt.savefig(f"{route_figure}\\NRMSE_Distributions.png")
     plt.show()
 
-    # ------------------------------------
-    # Figure 3 : Timing error
-    # ------------------------------------
-
-    fig = plt.figure(figsize=(10, 10))
-
-    ax0 = fig.add_subplot(2,2,1)
-    ax1 = fig.add_subplot(2,2,2)
-    ax2 = fig.add_subplot(2,1,2)
-
-    plot_distribution(
-        ax0,
-        np.array(dt_error_ch0)[np.isfinite(dt_error_ch0)],
-        f"CH0 Δt (σ={np.nanstd(dt_error_ch0):.3f} ns)",
-        "t_fit - t_samples (ns)"
-    )
-
-    plot_distribution(
-        ax1,
-        np.array(dt_error_ch1)[np.isfinite(dt_error_ch1)],
-        f"CH1 Δt (σ={np.nanstd(dt_error_ch1):.3f} ns)",
-        "t_fit - t_samples (ns)"
-    )
-
-    plot_distribution(
-        ax2,
-        np.array(dt_error_ch2)[np.isfinite(dt_error_ch2)],
-        f"CH2 Δt (σ={np.nanstd(dt_error_ch2):.3f} ns)",
-        "t_fit - t_samples (ns)"
-    )
-
-    plt.tight_layout()
-    plt.savefig(f"{route_figure}\\Time_Error_Distributions.png")
-    plt.show()
-
     return 0
 
 
@@ -267,15 +209,15 @@ if __name__ == "__main__":
 
     trigger = '0.005'
     voltage = '57'
-    run = '0'
-    day = '12'
+    run = '1'
+    day = '16'
     month = '10'
 
     route_figure = r".\All_plots_with_fit_data_3Ch\Plots"
 
     route_data = (
         fr".\Data\Raw_data\2Bar_3Ch\OpticalGreaseTests"
-        fr"\BeforeOptical_CoinTriggerCh0Ch1Ch2_{voltage}V"
+        fr"\AfterOptical_CoinTriggerCh0Ch1Ch2_{voltage}V"
         fr"\Run_{trigger}V_Run{run}_Data_{month}_{day}_2026_Ascii.dat"
     )
 

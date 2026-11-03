@@ -1,7 +1,8 @@
-'''
-I define time of arrival at 10% of the amplitude, and I want to see the distribution of these.
+"""
+I define time of arrival at 10% of the amplitude,
+and I want to see the distribution of these.
+"""
 
-'''
 import numpy as np
 import matplotlib.pyplot as plt
 import os
@@ -10,101 +11,118 @@ import sys
 # Add parent directory to Python path
 parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(parent_dir)
-from Functions import get_raw_datFile, perform_fit_on_dataframe, get_t_with_fit
+
+from Functions import (
+    get_raw_datFile,
+    perform_fit_on_dataframe,
+    get_t_with_fit,
+    f
+)
 
 dt = 0.3125
-def main(df, rate, route_figure):
+
+from scipy.integrate import quad
+def perform_integral_with_fit(A):
+    result, error = quad(lambda x: f(np.array([x]), A)[0], 0, 320)
+    return result
+
+def plot_distribution(ax, data, label, rate):
+
+    N = 0.5
+    bins = int(round(N * np.sqrt(len(data)), 0))
+
+    ax.hist(
+        data,
+        bins=bins,
+        alpha=0.7,
+        range=[min(data), max(data)],
+        histtype='step',
+        label=f"bins={bins}"
+    )
+
+    ax.set_title(
+        f"{label} (N={len(data)}, rate={rate}Hz)\n"
+        f"μ={np.mean(data):.3f} ns, σ={np.std(data):.3f} ns"
+    )
+
+    ax.set_xlabel(label + " (ns)")
+    ax.set_ylabel("Counts")
+    ax.grid(True)
+    ax.legend()
+
+
+def main(df, df_fit, route_figure):
+
     time_diff_01 = []
     time_diff_02 = []
     time_diff_12 = []
-    for row in df['channels']:
+
+    for row in df_fit['channels']:
+
         t0 = get_t_with_fit(row[0], 0.1)
         t1 = get_t_with_fit(row[1], 0.1)
         t2 = get_t_with_fit(row[2], 0.1)
 
-        # we could include a condition like this one to discriminate the events which are impossible to obtain.
-        if abs(t0 - t1) < 12 and abs(t2 - t1) < 12:
-                time_diff_01.append(t1-t0)
-                time_diff_02.append(t0-t2)
-                time_diff_12.append(t2-t1)
+        charge0 = perform_integral_with_fit(row[0])
+        charge1 = perform_integral_with_fit(row[1])
+        charge2 = perform_integral_with_fit(row[2])
 
-    fig, ax = plt.subplots(2, 2, figsize=(10, 10))
-    ax0, ax1, ax2, ax3 = ax.flatten()
-    
-    N = 0.5
-    bins0 = int(round( N * np.sqrt(len(time_diff_01)),0))
-    h0 = ax0.hist(
-            time_diff_01,
-            bins=bins0,
-            alpha=0.7,
-            label=f'bins={bins0}',
-            range=[min(time_diff_01), max(time_diff_01)],
-            histtype='step'
-            )
-    ax0.set_title(f"t1-t0 distribution (samples={len(time_diff_01)};rate={rate}Hz)")
-    ax0.set_ylabel("Counts")
-    ax0.set_xlabel("t1-t0 (ns)")
-    ax0.legend()
-    ax0.grid(True)
+        # reject impossible events
+        if charge2 < 0.5:
 
-    bins1 = int(round(N * np.sqrt(len(time_diff_02)),0))
-    h1 = ax1.hist(
-            time_diff_02,
-            bins=bins1,
-            alpha=0.7,
-            label=f'bins={bins1}',
-            range=[min(time_diff_02), max(time_diff_02)],
-            histtype='step'
-            )
-    ax1.set_title(f"t0-t2 distribution (samples={len(time_diff_02)};rate={rate}Hz)")
-    ax1.set_ylabel("Counts")
-    ax1.set_xlabel("t0-t2 (ns)")
-    ax1.legend()
-    ax1.grid(True)
+            time_diff_01.append(t1 - t0)
+            time_diff_02.append(t0 - t2)
+            time_diff_12.append(t2 - t1)
+    rate = round(len(time_diff_01) / (df['unix_time'].iloc[-1] - df['unix_time'].iloc[0]), 3)
 
-    bins2 = int(round(N * np.sqrt(len(time_diff_12)),0))
-    h2 = ax2.hist(
-            time_diff_12,
-            bins=bins2,
-            alpha=0.7,
-            label=f'bins={bins2}',
-            range=[min(time_diff_12), max(time_diff_12)],
-            histtype='step'
-            )
-    ax2.set_title(f"t2-t1 distribution (samples={len(time_diff_12)};rate={rate}Hz)")
-    ax2.set_ylabel("Counts")
-    ax2.set_xlabel("t2-t1 (ns)")
-    ax2.legend()
-    ax2.grid(True)
+    # --------------------------
+    # Figure layout
+    # --------------------------
+
+    fig = plt.figure(figsize=(10, 10))
+
+    ax0 = fig.add_subplot(2, 2, 1)
+    ax1 = fig.add_subplot(2, 2, 2)
+
+    # centered CH2 plot
+    ax2 = fig.add_subplot(2, 1, 2)
+
+    # --------------------------
+    # Plot
+    # --------------------------
+
+    plot_distribution(ax0, time_diff_01, "t1 - t0", rate)
+    plot_distribution(ax1, time_diff_02, "t0 - t2", rate)
+    plot_distribution(ax2, time_diff_12, "t2 - t1", rate)
 
     plt.tight_layout()
-    plt.savefig(f"{route_figure}\\TimeDifference_Histograms.png")
+    plt.savefig(
+        f"{route_figure}\\TimeDifference_Histograms.png"
+    )
     plt.show()
     plt.close()
 
     return 0
 
+
+# -----------------------------
+# Script entry point
+# -----------------------------
+
 if __name__ == "__main__":
 
-    trigger = '0.004'
+    trigger = '0.005'
     voltage = '57'
-    run = '0'
-    day = '20'
-    month = '8'
+    run = '1'
+    day = '16'
+    month = '10'
 
-    #route of folder where to save the figures
     route_figure = fr".\All_plots_with_fit_data_3Ch\Plots"
+    route_data = fr".\Data\Raw_data\2Bar_3Ch\OpticalGreaseTests\AfterOptical_CoinTriggerCh0Ch1Ch2_{voltage}V\Run_{trigger}V_Run{run}_Data_{month}_{day}_2026_Ascii"
 
-    # route of original data, will only use it to compare with the fit and discriminate events
-    #route_data = fr".\Data\Raw_data\10Bar_3Ch\coincidenceCh0Ch1Ch2_PS{voltage}V\Run_0.020V_Run0(changedCableCh1)_Data_8_18_2026_Ascii.dat"
-    route_data = fr".\Data\Raw_data\10Bar_3Ch\FollowingCorrectProcedure\coincidenceCh0Ch1Ch2_PS{voltage}V\Run_{trigger}V_Run{run}_Data_{month}_{day}_2026_Ascii.dat"
-    df = get_raw_datFile(route_data)
-    df = perform_fit_on_dataframe(df)
-    
-    # compute rate
-    RATE = len(df['unix_time'])/(df['unix_time'].iloc[-1] - df['unix_time'].iloc[0])
-    RATE = int(round(RATE, 0))
+    df = get_raw_datFile(route_data + ".dat")
+    df_fit = perform_fit_on_dataframe(df)
 
-    main(df, RATE, route_figure)
-    
+    main(df, df_fit, route_figure)
+
     print("\nEnd of execution.\n")

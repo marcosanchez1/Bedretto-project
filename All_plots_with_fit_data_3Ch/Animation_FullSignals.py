@@ -109,7 +109,7 @@ def main():
     for i in range(len(df_fit)):
         amplitude2 = df_fit['channels'].iloc[i][2][0]
 
-        if amplitude2 > 0.35:
+        if True:#amplitude2 > 0.35:
             frames.append(i)
     len(frames)
     ani = animation.FuncAnimation(

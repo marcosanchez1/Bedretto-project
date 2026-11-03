@@ -162,7 +162,6 @@ def perform_fit_on_samples(samples, baseline):
 
     left  = 0
     right = min(len(samples), peak_position+10) # I'm gonna keep this, at the end we're only interested up to the peak.
-
     t = np.arange(left, right) * dt
     samples = samples[left:right]
 
@@ -194,7 +193,7 @@ def perform_fit_on_samples(samples, baseline):
         residuals,
         p0,
         bounds=(lower, upper),
-        max_nfev=100,
+        max_nfev=500,
         method="trf"
     )
     return res.x

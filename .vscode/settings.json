@@ -1,4 +1,5 @@
 {
     "python-envs.defaultEnvManager": "ms-python.python:conda",
-    "python-envs.defaultPackageManager": "ms-python.python:conda"
+    "python-envs.defaultPackageManager": "ms-python.python:conda",
+    "cmake.sourceDirectory": "C:/Users/marco/OneDrive/Documentos/UniGe/Thesis/Bedretto_project/Simulations/Geant4Tests/B1"
 }

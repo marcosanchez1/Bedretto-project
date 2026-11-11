@@ -40,7 +40,7 @@ GAMMA_ALPHA, GAMMA_EMIN, GAMMA_EMAX = 2.0, 0.1, 4.0
 THRESHOLD   = 0.01       
 MUON_FLUX  = 0.02        
 GAMMA_FLUX = 1.0         
-T_MEAS     = 3600.0
+T_MEAS     = 10.0
 
 # Muon energy distribution parameters
 E_MIN_MU, E_MAX_MU = 1.0, 500.0
@@ -51,6 +51,9 @@ A_OVERBURDEN, ALPHA_OVERBURDEN = 2.5, 0.8
 ROCK_OVERBURDEN_MWE = 0.0 # Meters Water Equivalent (Bedretto is ~800-1000)
 
 MASTER_SEED = 20260513
+
+# This is to control if histograms are normalized or not, and change the y-label of histograms
+NORMALIZED = False
 
 # ============================================================
 # Numba Helpers
@@ -426,8 +429,14 @@ def main():
         centers = 0.5 * (bin_edges[:-1] + bin_edges[1:])
         dx      = bin_edges[1] - bin_edges[0]
 
-        density     = counts / (len(data) * dx)
-        density_err = np.sqrt(counts) / (len(data) * dx)
+        if NORMALIZED:
+            density     = counts / (len(data) * dx)
+            density_err = np.sqrt(counts) / (len(data) * dx)
+            ax.set_ylabel("Frequency")
+        else:
+            density     = counts
+            density_err = np.sqrt(counts)
+            ax.set_ylabel("Counts")
 
         # "mid" step: flat segment centred on each bin centre → aligns with errorbar markers
         ax.step(centers, density, where='mid', color=color, lw=1.5, label=label)
@@ -447,7 +456,6 @@ def main():
                       f"μ: {get_rate_str(len(muon_top), T_MEAS)}\n"
                       f"γ: {get_rate_str(len(gamma_top), T_MEAS)}")
     axes[0].set_xlabel("E_dep (MeV)")
-    axes[0].set_ylabel("Counts")
     axes[0].grid(True, alpha=0.3)
     axes[0].legend()
 
@@ -458,7 +466,6 @@ def main():
                       f"μ: {get_rate_str(len(muon_mid), T_MEAS)}\n"
                       f"γ: {get_rate_str(len(gamma_mid), T_MEAS)}")
     axes[1].set_xlabel("E_dep (MeV)")
-    axes[1].set_ylabel("Counts")
     axes[1].grid(True, alpha=0.3)
     axes[1].legend()
 
@@ -469,7 +476,6 @@ def main():
                       f"μ: {get_rate_str(len(muon_bot), T_MEAS)}\n"
                       f"γ: {get_rate_str(len(gamma_bot), T_MEAS)}")
     axes[2].set_xlabel("E_dep (MeV)")
-    axes[2].set_ylabel("Counts")
     axes[2].grid(True, alpha=0.3)
     axes[2].legend()
 

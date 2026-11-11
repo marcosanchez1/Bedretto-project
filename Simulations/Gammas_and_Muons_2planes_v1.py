@@ -1,6 +1,9 @@
 """
 Optimized Muon + Gamma energy deposition simulation using Numba.
 Requires: numpy, numba, matplotlib.
+
+This script simulates the energy deposition given a certain muon and gamma flux
+taking two bars in coincidence with air between them.
 """
 
 from matplotlib.pylab import default_rng
@@ -40,10 +43,10 @@ T_PER_SEED  = 1.0
 DEDX_MPV   = 2.0         # MeV/cm for muons in plastic
 DEDX_WIDTH = 0.3         # Landau width
 GAMMA_ALPHA, GAMMA_EMIN, GAMMA_EMAX = 2.0, 0.1, 4.0
-THRESHOLD   = 0.01       
-MUON_FLUX  = 0.02        
+THRESHOLD   = 0.01 # MeV. In our experiment we use a trigger of 5mV which if we do some smal computation should be equivalent to detection as min 100keV
+MUON_FLUX  = 0.02  
 GAMMA_FLUX = 1.0         
-T_MEAS     = 3600.0
+T_MEAS     = 300
 
 # Muon energy distribution parameters for Gaisser formula
 E_MIN_MU, E_MAX_MU = 1.0, 500.0
@@ -56,6 +59,9 @@ ROCK_OVERBURDEN_MWE = 0.0 # Meters Water Equivalent (m.w.e).
 
 #random number generator
 MASTER_SEED = 20260513
+
+# This is to control if histograms are normalized or not, and change the y-label of histograms
+NORMALIZED = False
 
 # ============================================================
 # Numba Helpers
@@ -407,9 +413,15 @@ def main():
         counts, bin_edges = np.histogram(data, bins=bins_all)
         centers = 0.5 * (bin_edges[:-1] + bin_edges[1:])
         dx      = bin_edges[1] - bin_edges[0]
-
-        density     = counts / (len(data) * dx)
-        density_err = np.sqrt(counts) / (len(data) * dx)
+        
+        if NORMALIZED:
+            density     = counts / (len(data) * dx)
+            density_err = np.sqrt(counts) / (len(data) * dx)
+            ax.set_ylabel("Frequency")
+        else:
+            density     = counts
+            density_err = np.sqrt(counts)
+            ax.set_ylabel("Counts")
 
         # "mid" step: flat segment centred on each bin centre → aligns with errorbar markers
         ax.step(centers, density, where='mid', color=color, lw=1.5, label=label)
@@ -422,13 +434,13 @@ def main():
         if n_events == 0: return "0.00 ± 0.00 Hz"
         return f"{n_events/time:.2f} ± {np.sqrt(n_events)/time:.2f} Hz"
 
+    
     plot_with_errors(axes[0], muon_Edep_top_bar, 'C0', 'Muon PDF')
     plot_with_errors(axes[0], gamma_Edep_top_bar, 'C1', 'Gamma PDF')
     axes[0].set_title(f"Top bar (2-bar coincidences)\n"
                       f"μ: {get_rate_str(len(muon_Edep_top_bar), T_MEAS)}\n"
                       f"γ: {get_rate_str(len(gamma_Edep_top_bar), T_MEAS)}")
     axes[0].set_xlabel("E_dep top bar (MeV)")
-    axes[0].set_ylabel("Probability density")
     axes[0].grid(True, alpha=0.3)
     axes[0].legend()
 
@@ -438,7 +450,7 @@ def main():
                       f"μ: {get_rate_str(len(muon_Edep_bottom_bar), T_MEAS)}\n"
                       f"γ: {get_rate_str(len(gamma_Edep_bottom_bar), T_MEAS)}")
     axes[1].set_xlabel("E_dep bottom bar (MeV)")
-    axes[1].set_ylabel("Probability density")
+    axes[1].set_ylabel("Counts")
     axes[1].grid(True, alpha=0.3)
     axes[1].legend()
 
